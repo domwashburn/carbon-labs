@@ -1659,6 +1659,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@carbon-labs/react-comparison-string@workspace:packages/react/src/components/ComparisonString":
+  version: 0.0.0-use.local
+  resolution: "@carbon-labs/react-comparison-string@workspace:packages/react/src/components/ComparisonString"
+  dependencies:
+    "@carbon-labs/utilities": "npm:0.21.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+  languageName: unknown
+  linkType: soft
+
+"@carbon-labs/react-condensed-attribute@workspace:packages/react/src/components/CondensedAttribute":
+  version: 0.0.0-use.local
+  resolution: "@carbon-labs/react-condensed-attribute@workspace:packages/react/src/components/CondensedAttribute"
+  dependencies:
+    "@carbon-labs/utilities": "npm:0.21.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+  languageName: unknown
+  linkType: soft
+
 "@carbon-labs/react-date-picker@workspace:packages/react/src/components/DatePicker":
   version: 0.0.0-use.local
   resolution: "@carbon-labs/react-date-picker@workspace:packages/react/src/components/DatePicker"
