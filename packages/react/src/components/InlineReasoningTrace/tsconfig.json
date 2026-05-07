@@ -1,0 +1,9 @@
+{
+  "extends": "typescript-config-carbon/tsconfig.base.json",
+  "compilerOptions": {
+    "noImplicitAny": false
+  },
+  "exclude": ["**/__stories__/*.stories.ts", "**/__tests__/*", "**/*d.ts"]
+}
+
+// Made with Bob

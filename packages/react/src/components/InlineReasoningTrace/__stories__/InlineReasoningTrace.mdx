@@ -1,0 +1,117 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as InlineReasoningTraceStories from './InlineReasoningTrace.stories';
+
+<Meta isTemplate />
+
+# InlineReasoningTrace
+
+- **Initiative owner(s):** Carbon Labs
+- **Status:** Experimental
+- **Target library:** TBD
+- **Target library maintainer(s) / PR Reviewer(s):** N/A
+- **Support channel:** `#carbon-labs`
+
+{/* <!-- START doctoc generated TOC please keep comment here to allow auto update --> */}
+{/* <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE --> */}
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Getting started](#getting-started)
+- [Component API](#component-api)
+
+{/* <!-- END doctoc generated TOC please keep comment here to allow auto update --> */}
+
+## Overview
+
+The `InlineReasoningTrace` component displays AI reasoning steps in a clean, hierarchical format. Each step can be expanded to show detailed content, with support for processing states, task type icons, and governance indicators.
+
+### Key Features
+
+- **Expandable/Collapsible**: Accordion-style display with individual step expansion
+- **Step Visibility Management**: Configurable initial visible steps with "Show more/less" functionality
+- **Processing State**: Real-time processing indicators with FLIP and fade animation modes
+- **Task Type Icons**: Support for both development and reasoning workflow icons
+- **Governance Indicators**: Visual indicators for governed content and warnings
+- **Smooth Animations**: GPU-accelerated transitions and animations
+
+## Getting started
+
+Install `@carbon-labs/react-inline-reasoning-trace` to use this component.
+
+```bash
+npm install @carbon-labs/react-inline-reasoning-trace
+```
+
+### Usage
+
+```jsx
+import { InlineReasoningTrace } from '@carbon-labs/react-inline-reasoning-trace';
+import '@carbon-labs/react-inline-reasoning-trace/scss/inline-reasoning-trace.scss';
+
+const steps = [
+  {
+    stepLabel: "Initial Analysis",
+    stepContent: "Analyzing the input data...",
+    taskType: "analyzing"
+  },
+  {
+    stepLabel: "Pattern Recognition",
+    stepContent: "Identified three distinct patterns...",
+    taskType: "searching"
+  }
+];
+
+function MyComponent() {
+  return (
+    <InlineReasoningTrace
+      triggerText="2 reasoning steps"
+      steps={steps}
+      openByDefault={false}
+    />
+  );
+}
+```
+
+## Component API
+
+### InlineReasoningTrace Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `steps` | `StepType[]` | Required | Array of reasoning steps to display |
+| `triggerText` | `string` | Required | Text to display in the collapsed trigger button |
+| `openByDefault` | `boolean` | `false` | Whether to show expanded on load |
+| `initialVisibleSteps` | `number` | `5` | Number of steps to show initially before "Show more" |
+| `showAllStepsByDefault` | `boolean` | `false` | Whether to show all steps when opening the trace |
+| `allowStepCollapse` | `boolean` | `true` | Whether to allow collapsing steps when all are shown |
+| `isProcessing` | `boolean` | `false` | Whether the trace is in processing state |
+| `currentProcessingStepIndex` | `number` | `0` | Index of the currently processing step |
+| `animationMode` | `'fade' \| 'flip'` | `'flip'` | Animation mode for processing state transitions |
+
+### StepType
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `stepLabel` | `string` | Label for the reasoning step |
+| `stepContent` | `React.ReactNode` | Content of the step (can be string, JSX, or any React node) |
+| `taskType` | `TaskType` | Type of task (shows corresponding icon) |
+| `customIcon` | `React.ReactNode` | Custom icon to display instead of task type icon |
+| `hasOverlay` | `boolean` | Show warning overlay for this step |
+| `isGoverned` | `string \| boolean` | Governance level ("full", "partial", false) |
+
+### Task Types
+
+**Development Tasks:**
+- `build`, `create`, `edit`, `update`, `run`, `test`, `deploy`, `misc`
+
+**Reasoning Tasks:**
+- `thinking`, `analyzing`, `searching`, `reviewing`, `validating`, `planning`, `executing`, `reasoning`
+
+## Animation Modes
+
+### FLIP Mode (Default)
+Uses the FLIP (First, Last, Invert, Play) technique for buttery-smooth 60fps GPU-accelerated animations. Provides smooth visual continuity as labels move between positions.
+
+### Fade Mode
+Simple and performant fade in/out transition. Best for reduced motion preferences or simpler use cases.

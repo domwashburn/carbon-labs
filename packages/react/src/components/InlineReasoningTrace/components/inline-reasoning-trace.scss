@@ -1,0 +1,529 @@
+@use '@carbon/react/scss/theme' as *;
+@use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/colors' as *;
+@use '@carbon/react/scss/type';
+@use '@carbon/react/scss/utilities';
+@use '@carbon/motion' as *;
+
+// Carbon expressive easing
+$expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
+
+.reasoningTraceList {
+  /* Container styles */
+}
+
+.headerWrapper {
+  display: flex;
+  padding: $spacing-01 0px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.chevronIcon {
+  /* Chevron icon anchored to trigger button using CSS Anchor Positioning */
+  position: absolute;
+  position-anchor: --trigger-anchor;
+  left: anchor(left);
+  top: calc(anchor(top) + 4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-primary;
+  width: 16px;
+  height: 16px;
+  pointer-events: none; /* Allow clicks to pass through to button */
+
+  svg {
+    display: block;
+  }
+}
+
+  
+.title {
+  /* Title styles */
+  @include type.type-style('heading-03');
+  color: $text-primary;
+  margin-bottom: 8px;
+}
+
+.headerTitleGroup {
+  display: flex;
+  padding-right: $spacing-03;
+  align-items: center;
+  gap: $spacing-02;
+  flex: 1 0 0;
+}
+
+.nestedIndicator {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 8px;
+  margin: 0 8px;
+
+  &::before,
+  &::after {
+    width: 8px;
+  }
+
+  &::before {
+    display: inline-flex;
+    height: 10px;
+    content: '';
+    /* background-color: aqua; */
+    border-left: 1px solid #d2d2d2; /* $border-01 */
+    border-bottom: 1px solid #d2d2d2; /* $border-01 */
+
+    .trigger & {
+      opacity: 0;
+      height: 18px;
+    }
+  }
+
+  &::after {
+    display: inline-flex;
+    content: '';
+    /* background-color: palevioletred; */
+    border-left: 1px solid #d2d2d2; /* $border-01 */
+    flex: 1 0 0;
+
+    .listItem:last-of-type & {
+      border-left: none;
+    }
+    
+    // Keep border when item is not truly last (has more steps below)
+    .listItem.listItemNotLast & {
+      border-left: 1px solid #d2d2d2; /* $border-01 */
+    }
+  }
+}
+
+.trigger {
+  /* Trigger button styles */
+  @include type.type-style('body-02');
+  display: flex;
+  flex-direction: row;
+  background-color: $layer-02;
+  border: none;
+  color: $text-primary;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  padding: 0;
+  padding-left: 24px; /* Consistent padding for when nestedIndicator is hidden */
+  anchor-name: --trigger-anchor;
+
+  &:hover {
+    background-color: $layer-hover-02;
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 $spacing-01 $focus;
+  }
+}
+
+.triggerExpanded {
+  /* When expanded, nestedIndicator is visible so no extra padding needed */
+  padding-left: 0;
+}
+
+.list {
+  /* List styles */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  animation: slideIn $duration-moderate-02 $expressive-easing;
+  transform-origin: top;
+}
+
+.hiddenStepsList {
+  /* Hidden steps list - flows seamlessly with main list */
+  margin-top: 0;
+  padding-top: 0;
+  animation: slideIn $duration-moderate-02 $expressive-easing;
+  transform-origin: top;
+  
+  // Remove animation on first load to prevent double animation
+  &.listNoAnimation {
+    animation: none;
+  }
+  
+  // Apply exit animation
+  &.listExiting {
+    animation: slideOut $duration-moderate-02 $expressive-easing;
+  }
+}
+
+.listNoAnimation {
+  animation: none;
+}
+
+.listExiting {
+  animation: slideOut $duration-moderate-02 $expressive-easing;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.listItem {
+  /* List item styles */
+  display: flex;
+  flex-direction: row;
+  animation: fadeIn $duration-moderate-01 $expressive-easing;
+  animation-fill-mode: both;
+  
+  // Stagger animation for each list item
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.03}s;
+    }
+  }
+}
+
+.listItemNoAnimation {
+  animation: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.stepListContent {
+  display: flex;
+  padding: $spacing-01 $spacing-02 $spacing-01 0;
+  align-items: flex-start;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: $spacing-02;
+}
+
+.stepNameWrapper {
+  /* Wrapper for step name and task icon */
+  display: flex;
+  align-items: center;
+  gap: $spacing-02;
+  position: relative;
+}
+
+.accessibleText {
+  /* Hidden text for screen readers - always present for accessibility */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.stepName {
+  /* Static text styles - shown when not processing */
+  @include type.type-style('label-02');
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.stepNameGradient {
+  /* Gradient text for streaming and processing states */
+  @include type.type-style('label-02');
+  font-weight: 600;
+  background: linear-gradient(
+    90deg,
+    #8a3ffc 0%,      /* Purple 70 */
+    #0f62fe 33%,     /* Blue 60 */
+    #1192e8 66%,     /* Blue 50 */
+    #0072c3 100%     /* Blue 60 darker */
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 200% 0;
+  
+  /* Smooth transition for gradient position changes */
+  transition: background-position 0.1s linear;
+  
+  /* Enable GPU acceleration for smoother animation */
+  will-change: background-position;
+}
+
+.stepNameGradientStreaming {
+  /* During streaming: gradient moves with text reveal */
+  /* Position is controlled dynamically via inline style based on progress */
+  transition: background-position 0.05s linear;
+}
+
+.stepNameGradientProcessing {
+  /* Seamless transition from streaming to processing shimmer animation */
+  animation: aiGradientShimmer 5s ease-in-out infinite;
+  /* Start animation from current position for seamless handoff */
+  animation-fill-mode: both;
+}
+
+@keyframes aiGradientShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  50% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Reduced motion support - respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  .stepNameGradient {
+    /* Disable gradient animation for users who prefer reduced motion */
+    animation: none !important;
+    background-position: 0% 0 !important;
+    transition: none !important;
+  }
+  
+  .taskIconWrapper {
+    /* Disable icon color cycling */
+    animation: none !important;
+  }
+}
+
+.taskIconWrapper {
+  /* Wrapper for task type icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-secondary;
+  flex-shrink: 0;
+  
+  /* Apply gradient animation when parent has processing state */
+  .stepNameWrapperProcessing & {
+    animation: iconColorCycle 5s ease-in-out infinite;
+  }
+}
+
+@keyframes iconColorCycle {
+  0% {
+    color: #0072c3; /* Blue 60 darker - matches gradient at 200% position */
+  }
+  25% {
+    color: #1192e8; /* Blue 50 - gradient moving through */
+  }
+  50% {
+    color: #8a3ffc; /* Purple 70 - gradient at -200% position (center) */
+  }
+  75% {
+    color: #1192e8; /* Blue 50 - gradient moving back */
+  }
+  100% {
+    color: #0072c3; /* Blue 60 darker - back to 200% position */
+  }
+}
+
+.taskIcon {
+  /* Task type icon */
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.stepValueWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-02;
+  width: 100%;
+}
+
+.stepValue {
+  /* Step value styles */
+  @include type.type-style('body-compact-01');
+  color: $text-primary;
+  width: 100%;
+  line-height: 1.5; /* Ensure consistent line height */
+  transition: max-height $duration-moderate-02 $expressive-easing;
+  overflow: hidden;
+}
+
+.stepValueClamped {
+  /* Limit to approximately 3 lines */
+  position: relative;
+  max-height: 4.5em !important; /* 3 lines × 1.5 line-height = 4.5em */
+}
+
+.stepValueWithFade {
+  /* Feather/fade effect at the bottom - only when content overflows */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3.5rem; /* 1 line height for fade */
+    background: linear-gradient(to bottom, transparent, $layer-02 98%);
+    pointer-events: none;
+    transition: opacity $duration-fast-02 $expressive-easing;
+  }
+}
+
+.showMoreButton {
+  /* Show more/less button */
+  @include type.type-style('body-compact-01');
+  background: none;
+  border: none;
+  color: $link-primary;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+  transition: color $duration-fast-01 $expressive-easing;
+  
+  &:hover {
+    color: $link-primary-hover;
+  }
+  
+  &:focus {
+    outline: 2px solid $focus;
+    outline-offset: 2px;
+  }
+}
+
+.showMoreListItem {
+  /* List item for show more/less steps button */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  
+  // Ensure nested indicator connects properly
+  .nestedIndicator {
+    &::before {
+      height: 10px;
+    }
+    
+    &::after {
+      // No vertical line after show more/less button (it's the last item)
+      border-left: none;
+    }
+  }
+}
+
+.showMoreStepsButton {
+  /* Show more/less steps button */
+  @include type.type-style('body-compact-01');
+  background: none;
+  border: none;
+  color: $link-primary;
+  cursor: pointer;
+  padding: $spacing-01 $spacing-02;
+  text-align: left;
+  text-decoration: underline;
+  transition: color $duration-fast-01 $expressive-easing;
+  
+  &:hover {
+    color: $link-primary-hover;
+  }
+  
+  &:focus {
+    outline: 2px solid $focus;
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================
+   Processing Label Styles
+   ============================================ */
+
+.processingLabel {
+  /* Processing label shown below collapsed trigger */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: $spacing-02 0;
+  animation: processingLabelFadeIn $duration-moderate-01 $expressive-easing;
+  animation-fill-mode: both;
+  
+  /* FLIP animation will override transform when in flip mode */
+  will-change: transform, opacity;
+}
+
+.processingLabelContent {
+  display: flex;
+  padding: $spacing-01 $spacing-02 $spacing-01 0;
+  align-items: flex-start;
+  flex: 1 0 0;
+}
+
+/* Fade animation mode - simple fade in/out */
+.processingLabelFade {
+  animation: processingLabelFadeIn $duration-moderate-01 $expressive-easing;
+}
+
+@keyframes processingLabelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FLIP animation mode - will be controlled by JavaScript */
+.processingLabelFlip {
+  /* Initial state - JavaScript will handle the FLIP animation */
+  animation: none;
+  
+  /* Smooth transition for FLIP technique */
+  transition: transform $duration-moderate-02 $expressive-easing,
+              opacity $duration-moderate-02 $expressive-easing;
+}
+
+/* When processing label is animating via FLIP */
+.processingLabelFlip[data-flip-animating="true"] {
+  /* GPU acceleration for smooth animation */
+  transform: translate3d(0, 0, 0);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .processingLabel {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .processingLabelFade,
+  .processingLabelFlip {
+    animation: none !important;
+    transition: none !important;
+  }
+}

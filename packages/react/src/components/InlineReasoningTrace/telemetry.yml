@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://unpkg.com/@ibm/telemetry-config-schema@v1/dist/config.schema.json
+
+version: 1
+projectId: c3e81c63-8688-4d9d-9f8f-2c0c369a780a
+endpoint: https://www-api.ibm.com/ibm-telemetry/v1/metrics
+collect:
+  jsx:
+    elements:
+      allowedAttributeNames:
+        # InlineReasoningTrace
+        - steps
+        - triggerText
+        - openByDefault
+        - initialVisibleSteps
+        - showAllStepsByDefault
+        - allowStepCollapse
+        - isProcessing
+        - currentProcessingStepIndex
+        - animationMode
+        # React
+        - key
+        - ref
+      allowedAttributeStringValues:
+        # InlineReasoningTrace - animationMode
+        - fade
+        - flip
+        # InlineReasoningTrace - taskType
+        - build
+        - create
+        - edit
+        - update
+        - run
+        - test
+        - deploy
+        - misc
+        - thinking
+        - analyzing
+        - searching
+        - reviewing
+        - validating
+        - planning
+        - executing
+        - reasoning
+  npm:
+    dependencies: null
+  js:
+    functions: {}
+    tokens: null
+
+# Made with Bob
