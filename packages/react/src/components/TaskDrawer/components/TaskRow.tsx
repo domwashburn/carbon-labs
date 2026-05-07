@@ -69,9 +69,8 @@ export function TaskRow({
   }, [registerRef, rowRef]);
 
   // ── Derived presentation values ─────────────────────────────────────────────
-  const tintGradient = config.rowTint
-    ? `linear-gradient(90deg, transparent 80%, ${config.rowTint} 100%)`
-    : undefined;
+  // Target config drives the tint immediately (concurrent with icon dissolve)
+  const targetConfig = STATUS_CONFIG[task.status];
 
   // A `dropped` mutation forces line-through regardless of status config
   const isStruck = config.strike || mutation === "dropped";
@@ -99,22 +98,21 @@ export function TaskRow({
       aria-current={isCurrent ? "step" : undefined}
     >
       {/* ── Tint gradient overlay ─────────────────────────────────────────── */}
-      {tintGradient && (
-        <div
-          className={`${prefix}--task-row__tint`}
-          data-visible={isVisible}
-          style={{
-            background: config.rowTint
-              ? `linear-gradient(90deg, transparent 85%, color-mix(in srgb, ${config.iconColor} 30%, transparent) 110%)`
-              : undefined,
-          }}
-          aria-hidden="true"
-        />
-      )}
+      <div
+        className={`${prefix}--task-row__tint`}
+        data-visible={isVisible && !!targetConfig.rowTint}
+        style={{
+          '--ptl-tint-color': targetConfig.rowTint
+            ? `color-mix(in srgb, ${targetConfig.iconColor} 30%, transparent)`
+            : 'transparent',
+        } as React.CSSProperties}
+        aria-hidden="true"
+      />
 
       <div className={`${prefix}--task-row__content`} aria-hidden="true">
         <span
-          className={`${prefix}--task-row__index`}
+          key={index}
+          className={`${prefix}--task-row__index ${prefix}--task-row__index-enter`}
           style={
             displayStatus === "generating" ||
             displayStatus === "queued" ||
@@ -142,7 +140,7 @@ export function TaskRow({
             </div>
           ) : (
             <div
-              key={displayStatus}
+              key={`${task.label}-${isStruck}`}
               className={`${prefix}--task-row__label ${prefix}--task-row__label-enter`}
               data-strike={isStruck}
               style={{
@@ -168,7 +166,11 @@ export function TaskRow({
 
       <span
         key={displayStatus}
-        className={`${prefix}--task-row__icon-enter`}
+        className={
+          isTransitioning
+            ? `${prefix}--task-row__icon-exit`
+            : `${prefix}--task-row__icon-enter`
+        }
         style={{ display: "inline-flex", flexShrink: 0 }}
         aria-hidden="true"
       >
