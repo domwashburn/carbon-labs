@@ -13,11 +13,13 @@
 @use '@carbon/react/scss/type';
 @use '@carbon/react/scss/utilities';
 
+$prefix: 'clabs' !default;
 
-[data-compare-mode="true"] {
-    /* 
-    adjust top and left to account for highlight padding; 
-    this ensures the string doesn't jump when toggling compare off and on 
+.#{$prefix}--comparison-string {
+  &[data-compare-mode='true'] {
+    /*
+    adjust top and left to account for highlight padding;
+    this ensures the string doesn't jump when toggling compare off and on
     */
     display: inline-block;
     transform: translateX(calc(-0.2em - 1px)) translateY(calc(-0.061em));
@@ -25,47 +27,45 @@
     height: fit-content;
     line-height: inherit;
 
-    .comparisonSegment {
+    .#{$prefix}--comparison-string__segment {
+      display: inline-block;
+      border-style: solid;
+      border-width: 1px 0 1px 0;
+      border-color: $border-subtle-01;
+      background: $layer-01;
+      box-sizing: border-box;
+      line-height: 1em;
+      padding-bottom: 0.0625em;
 
-        display: inline-block;
-        border-style: solid;
-        border-width: 1px 0 1px 0;
-        border-color: var(--border-subtle-contextual, #E0E0E0);
-        background: var(--Default-Gray-10, #F4F4F4);
-        box-sizing: border-box;
-        line-height: 1em; /* this sets the height of the highlight at 1em so it scales with the base font size */
-        padding-bottom: 0.0625em; /* This offsets by 1px at base rem, and scales with the base font size */
-    
-        -webkit-box-decoration-break: clone;
-        box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
 
-        &:only-child {
-            border-width: 1px;
-            border-radius: 4px;
-        }
+      &:only-child {
+        border-width: 1px;
+        border-radius: 4px;
+      }
 
-        &:first-child:not(:only-child) {
-            border-width: 1px 0 1px 1px;
-            border-radius: 4px 0 0 4px;
-            padding-left: 0.2em;
-        }
+      &:first-child:not(:only-child) {
+        border-width: 1px 0 1px 1px;
+        border-radius: 4px 0 0 4px;
+        padding-left: 0.2em;
+      }
 
-        &:last-child:not(:only-child) {
-            border-width: 1px 1px 1px 0;
-            border-radius: 0 4px 4px 0;
-            padding-right: 0.2em;
-        }
+      &:last-child:not(:only-child) {
+        border-width: 1px 1px 1px 0;
+        border-radius: 0 4px 4px 0;
+        padding-right: 0.2em;
+      }
     }
 
-    &[data-highlight-same="true"] .isSame {
-        border-color: var(--Default-Cyan-30, #82CFFF);
-        background: var(--Default-Cyan-20, #BAE6FF);
+    &[data-highlight-same='true'] .#{$prefix}--comparison-string__segment--same {
+      border-color: $cyan-30;
+      background: $cyan-20;
     }
 
-    &[data-highlight-different="true"] .isDifferent {
-        border-color: var(--Default-Red-30, #FFB3B8);
-        background: var(--Default-Red-20, #FFD7D9);
+    &[data-highlight-different='true'] .#{$prefix}--comparison-string__segment--different {
+      border-color: $red-30;
+      background: $red-20;
     }
+  }
 }
-
-// Made with Bob

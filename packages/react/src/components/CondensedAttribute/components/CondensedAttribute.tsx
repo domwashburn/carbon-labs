@@ -12,21 +12,11 @@ import cx from 'classnames';
 import { DefinitionTooltip } from '@carbon/react';
 import { Rule, RulePartial, WarningAlt} from '@carbon/icons-react';
 import { ComparisonString } from '../../ComparisonString';
-import styles from './condensed-attribute.scss';
-
-/**
- * CondensedAttribute component
- * 
- * Displays a list of attribute values in a clean and readable format.
- * 
- * @param {object} props
- * @param {string} props.attribute - Attribute name
- * @param {array} props.fields - Array of field objects with label and value
- * @param {string} props.delimiter - Custom delimiter (e.g. ";", or " • ")
- */
+import { usePrefix } from '@carbon-labs/utilities/usePrefix';
 
 const CondensedAttribute = ({ attribute, fields, delimiter = ', ', openByDefault = false, hasOverlay= true }) => {
 
+  const prefix = usePrefix();
   const [isExpanded, setIsExpanded] = openByDefault ? useState(true) : useState(false);
 
   const triggerText = useMemo(() => {
@@ -40,21 +30,19 @@ const CondensedAttribute = ({ attribute, fields, delimiter = ', ', openByDefault
     }).join('');
   }, [fields, delimiter]);
 
-
-
   const handleToggle = useCallback(() => {
     setIsExpanded(!isExpanded);
   }, [isExpanded]);
 
   return (
-    <div className={styles.attributeValueList}>
+    <div className={`${prefix}--condensed-attribute`}>
       <CondensedAttribute.Header attribute={attribute} />
       <button
-        className={styles.trigger}
+        className={`${prefix}--condensed-attribute__trigger`}
         aria-expanded={isExpanded}
         onClick={handleToggle}
       >
-        <span className={styles.nestedIndicator} />
+        <span className={`${prefix}--condensed-attribute__nested-indicator`} />
         <span>{triggerText}</span>
       </button>
       {isExpanded ? <CondensedAttribute.FieldList fields={fields} isExpanded /> : null }
@@ -63,9 +51,10 @@ const CondensedAttribute = ({ attribute, fields, delimiter = ', ', openByDefault
 };
 
 const CondensedAttributeHeader = ({ attribute, governanceRuleType="partial", Link = {linkLabel: "link"} }) => {
+  const prefix = usePrefix();
   return (
-    <div className={cx(styles.headerWrapper)}>
-      <div className={cx(styles.headerTitleGroup)}>
+    <div className={`${prefix}--condensed-attribute__header-wrapper`}>
+      <div className={`${prefix}--condensed-attribute__header-title-group`}>
         <DefinitionTooltip
             openOnHover
             align="bottom"
@@ -75,11 +64,11 @@ const CondensedAttributeHeader = ({ attribute, governanceRuleType="partial", Lin
         </DefinitionTooltip>
         <CondensedAttributeIconIndicators value={attribute} />
       </div>
-      {/* Render a link in the header if one is passed in */}
       { Link && <a href={ Link.path ? Link.path : '#' }>{ Link.linkLabel } </a> }
     </div>
   )
 }
+
 const CondensedAttributeIconIndicators = ({value}) => {
   return([
     value.hasOverlay && <WarningAlt />,
@@ -89,22 +78,24 @@ const CondensedAttributeIconIndicators = ({value}) => {
 }
 
 const CondensedAttributeFieldList = ({fields, isExpanded}) => {
+  const prefix = usePrefix();
   return (
-    <div className="" >
-      <ul className={cx(styles.accordionContent, styles.list)}>
-        {fields.map((field, index) => <CondensedAttribute.Field field={field} index={index} /> )}
+    <div>
+      <ul className={cx(`${prefix}--condensed-attribute__list`)}>
+        {fields.map((field, index) => <CondensedAttribute.Field field={field} index={index} key={index} /> )}
       </ul>
     </div>
   );
 }
 
 const CondensedAttributeField = ({field, index}) => {
+  const prefix = usePrefix();
   return (
-    <li key={index} className={styles.listItem}>
-      <span className={styles.nestedIndicator} />
-      <div className={styles.fieldListContent}>
-        <span className={styles.attributeName}>{field.fieldLabel}</span>
-        <ComparisonString compareMode={true} className={styles.attributeValue} segmentedString={field.fieldValue.segments} />
+    <li key={index} className={`${prefix}--condensed-attribute__list-item`}>
+      <span className={`${prefix}--condensed-attribute__nested-indicator`} />
+      <div className={`${prefix}--condensed-attribute__field-list-content`}>
+        <span className={`${prefix}--condensed-attribute__attribute-name`}>{field.fieldLabel}</span>
+        <ComparisonString compareMode={true} className={`${prefix}--condensed-attribute__attribute-value`} segmentedString={field.fieldValue.segments} />
       </div>
       <CondensedAttributeIconIndicators value={field} />
     </li>
@@ -115,12 +106,10 @@ CondensedAttribute.Header = CondensedAttributeHeader;
 CondensedAttribute.FieldList = CondensedAttributeFieldList;
 CondensedAttribute.Field = CondensedAttributeField;
 
-
 export {
+  CondensedAttribute,
   CondensedAttributeHeader,
   CondensedAttributeFieldList,
   CondensedAttributeField
 }
 export default CondensedAttribute;
-
-// Made with Bob

@@ -9,31 +9,31 @@
 
 import React from 'react';
 import cx from 'classnames';
-import styles from './comparison-string.scss';
+import { usePrefix } from '@carbon-labs/utilities/usePrefix';
 
-export const ComparisonString = ({ 
-    segmentedString, 
-    compareMode = false, 
-    highlightIsSame = false, 
-    highlightIsDifferent = false, 
+export const ComparisonString = ({
+    segmentedString,
+    compareMode = false,
+    highlightIsSame = false,
+    highlightIsDifferent = false,
     className }) => {
- 
+
+    const prefix = usePrefix();
+
     let concatenatedValue = Array.isArray(segmentedString) && segmentedString.length >= 1 ? segmentedString.map((item, index) => {
 
-        item === null && <span key={index} className={cx(styles.comparisonSegment, comparisonStyle) }>-</span>
-    
-        let comparisonStyle = item.comparison === "isSame" ? styles.isSame : styles.isDifferent;
+        if (item === null) return <span key={index} className={cx(`${prefix}--comparison-string__segment`)}>-</span>;
 
-        return <span key={index} className={cx(styles.comparisonSegment, comparisonStyle) }>{item.segment}</span>
+        const comparisonStyle = item.comparison === "isSame"
+          ? `${prefix}--comparison-string__segment--same`
+          : `${prefix}--comparison-string__segment--different`;
 
-    }) : <span className="">-</span>;
+        return <span key={index} className={cx(`${prefix}--comparison-string__segment`, comparisonStyle)}>{item.segment}</span>
+
+    }) : <span>-</span>;
 
 
-    return( <span className={cx(styles.comparison, className)} data-compare-mode={compareMode} data-highlight-same={highlightIsSame} data-highlight-different={highlightIsDifferent}>{concatenatedValue}</span>);
-
-
+    return( <span className={cx(`${prefix}--comparison-string`, className)} data-compare-mode={compareMode} data-highlight-same={highlightIsSame} data-highlight-different={highlightIsDifferent}>{concatenatedValue}</span>);
 };
 
 export default ComparisonString;
-
-// Made with Bob
