@@ -1,0 +1,610 @@
+/**
+ * Copyright IBM Corp. 2026
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/spacing' as *;
+@use '@carbon/styles/scss/type' as *;
+@use '@carbon/styles/scss/motion' as *;
+@use '@carbon/react/scss/components/tag/tokens' as tag;
+
+$prefix: 'clabs' !default;
+
+// =============================================================================
+// TaskDrawer — root container
+// =============================================================================
+
+.#{$prefix}--task-drawer {
+  width: 100%;
+  overflow: hidden;
+  background: $layer-01;
+  border: 1px solid $border-subtle-01;
+  border-top-left-radius: $spacing-03;
+  border-top-right-radius: $spacing-03;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  animation: taskDrawerEnter $duration-moderate-02 motion(standard, expressive) both;
+
+  --ptl-row-height: calc(
+    #{$spacing-05} + 2 * #{$spacing-03} + 1px
+  );
+  --ptl-max-body-height: calc(4.5 * var(--ptl-row-height));
+
+  will-change: transform;
+}
+
+@keyframes taskDrawerEnter {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+// =============================================================================
+// TaskDrawer — animated body region
+// =============================================================================
+
+.#{$prefix}--task-drawer__body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: max-height $duration-moderate-02 motion(standard, expressive);
+}
+
+// =============================================================================
+// TaskDrawer — task list stack
+// =============================================================================
+
+.#{$prefix}--task-drawer__task-list {
+  display: flex;
+  flex-direction: column;
+
+  > div:last-child {
+    border-bottom: none;
+  }
+}
+
+// =============================================================================
+// TaskDrawer — screen-reader skip link
+// =============================================================================
+
+.#{$prefix}--task-drawer__skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+
+  background: transparent;
+  cursor: pointer;
+
+  @include type-style('label-01');
+}
+
+// =============================================================================
+// TaskDrawerHeader — header container
+// =============================================================================
+
+.#{$prefix}--task-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  border-bottom: 1px solid $border-subtle-01;
+  transition: border-bottom-color $duration-moderate-02 motion(standard, productive);
+
+  &[data-expanded='false'] {
+    border-bottom-color: transparent;
+  }
+}
+
+// =============================================================================
+// TaskDrawerHeader — toggle button
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__toggle-btn {
+  flex-shrink: 0;
+  width: $spacing-07;
+  height: $spacing-07;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: $icon-secondary;
+  transition: background-color $duration-fast-02 motion(standard, productive);
+  font-size: inherit;
+
+  &:hover {
+    background: $layer-hover-01;
+  }
+}
+
+// =============================================================================
+// TaskDrawerHeader — content wrapper (title col + trailing area)
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__content-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-03;
+  padding-top: $spacing-03;
+  padding-bottom: $spacing-03;
+  padding-right: $spacing-03;
+}
+
+// =============================================================================
+// TaskDrawerHeader — title column
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__title-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.#{$prefix}--task-drawer-header__title {
+  @include type-style('label-01');
+
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+  color: $text-primary;
+}
+
+// =============================================================================
+// TaskDrawerHeader — preview animated region
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__preview-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows $duration-moderate-02 motion(standard, expressive);
+
+  &[data-expanded='false'] {
+    grid-template-rows: 0fr;
+  }
+}
+
+.#{$prefix}--task-drawer-header__preview-inner {
+  overflow: hidden;
+  min-height: 0;
+  opacity: 1;
+  transition: opacity $duration-moderate-02 motion(standard, expressive);
+
+  .#{$prefix}--task-drawer-header__preview-wrap[data-expanded='false'] & {
+    opacity: 0;
+  }
+}
+
+.#{$prefix}--task-drawer-header__preview {
+  @include type-style('label-01');
+
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+  padding-top: $spacing-02;
+  color: $text-secondary;
+}
+
+// =============================================================================
+// TaskDrawerHeader — status area (inline action + status icon slot)
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__status-area {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: $spacing-03;
+}
+
+// =============================================================================
+// TaskDrawerHeader — status icon slot
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__status-icon-slot {
+  position: relative;
+  width: $spacing-05;
+  height: $spacing-05;
+  flex-shrink: 0;
+  color: $icon-secondary;
+
+  svg path {
+    fill: currentColor;
+  }
+
+  &[data-plan-status='generating'],
+  &[data-plan-status='updating'] {
+    color: $icon-secondary;
+  }
+
+  &[data-plan-status='paused'] {
+    color: $support-warning;
+  }
+
+  &[data-plan-status='executing'] {
+    color: $interactive;
+  }
+
+  &[data-plan-status='complete'] {
+    color: $support-success;
+  }
+
+  &[data-plan-status='failed'] {
+    color: $support-error;
+  }
+}
+
+// =============================================================================
+// TaskDrawerHeader — icon frame (keyed span inside the slot)
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__icon-frame {
+  position: absolute;
+  inset: 0;
+  animation: iconFadeIn $duration-fast-02 motion(standard, productive) both;
+}
+
+@keyframes iconFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// =============================================================================
+// TaskDrawerHeader — spin animation (generating / updating)
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__spin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: ptl-header-spin 1s linear infinite;
+}
+
+@keyframes ptl-header-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================================================
+// TaskDrawerHeader — inline action (e.g. Review link)
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__inline-action {
+  @include type-style('label-01');
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: $interactive;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color $duration-fast-02 motion(standard, productive);
+
+  &:hover {
+    color: $link-primary-hover;
+    text-decoration: underline;
+  }
+}
+
+// =============================================================================
+// TaskDrawerHeader — dismiss button (icon only, trailing right)
+// =============================================================================
+
+.#{$prefix}--task-drawer-header__dismiss-btn {
+  flex-shrink: 0;
+  width: $spacing-07;
+  height: $spacing-07;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: $icon-secondary;
+  transition: color $duration-fast-02 motion(standard, productive);
+
+  &:hover {
+    background: $layer-hover-01;
+  }
+}
+
+// =============================================================================
+// TaskRow — row container
+// =============================================================================
+
+.#{$prefix}--task-row {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: $spacing-03;
+  padding-top: $spacing-03;
+  padding-bottom: $spacing-03;
+  padding-left: $spacing-02;
+  padding-right: $spacing-04;
+  border-bottom: 1px solid $border-subtle-01;
+  background: $layer-01;
+
+  opacity: 0;
+  transform: translateY($spacing-02);
+  transition:
+    opacity $duration-moderate-02 motion(standard, expressive),
+    transform $duration-moderate-02 motion(standard, expressive);
+
+  &[data-visible='true'] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $focus;
+    outline-offset: -2px;
+    z-index: 2;
+    border-radius: $spacing-01;
+  }
+
+  &[data-visible='true'][data-transitioning='true'] {
+    opacity: 0.5;
+    transition:
+      opacity $duration-fast-02 motion(standard, productive),
+      transform $duration-moderate-02 motion(standard, expressive);
+  }
+}
+
+// =============================================================================
+// TaskRow — tint gradient overlay
+// =============================================================================
+
+.#{$prefix}--task-row__tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity $duration-slow-01 motion(standard, expressive);
+
+  &[data-visible='true'] {
+    opacity: 1;
+  }
+}
+
+// =============================================================================
+// TaskRow — text content
+// =============================================================================
+
+.#{$prefix}--task-row__content {
+  @include type-style('label-01');
+
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: baseline;
+  gap: $spacing-02;
+  position: relative;
+  z-index: 1;
+}
+
+.#{$prefix}--task-row__index {
+  flex-shrink: 0;
+  width: $spacing-06;
+  text-align: right;
+  color: $text-secondary;
+}
+
+.#{$prefix}--task-row__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &[data-strike='true'] {
+    text-decoration: line-through;
+  }
+}
+
+// =============================================================================
+// TaskRow — label enter animation
+// =============================================================================
+
+.#{$prefix}--task-row__label-enter {
+  animation: labelFadeIn $duration-moderate-02 motion(standard, expressive) both;
+}
+
+@keyframes labelFadeIn {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+// =============================================================================
+// TaskRow — status icon enter animation
+// =============================================================================
+
+.#{$prefix}--task-row__icon-enter {
+  animation: iconScaleIn 150ms motion(standard, productive) both;
+}
+
+@keyframes iconScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// =============================================================================
+// TaskRow — mutation tag
+// =============================================================================
+
+.#{$prefix}--task-row__mutation-tag {
+  @include type-style('label-01');
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+
+  height: calc(#{$spacing-05} + #{$spacing-02});
+  padding-left: $spacing-03;
+  padding-right: $spacing-03;
+  border-radius: calc(#{$spacing-05} + #{$spacing-02});
+
+  background-color: tag.$tag-background-blue;
+  color: tag.$tag-color-blue;
+  white-space: nowrap;
+
+  animation: mutationTagIn 150ms motion(standard, expressive) both;
+}
+
+@keyframes mutationTagIn {
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// =============================================================================
+// TaskRow — skeleton loading
+// =============================================================================
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    background-position: 200% 0;
+    opacity: 0.8;
+  }
+}
+
+.#{$prefix}--task-row__skeleton {
+  width: 60%;
+  height: 0.75rem;
+  background-color: $skeleton-element;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    $layer-hover-01 20%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 3000ms motion(standard, productive) infinite;
+  border-radius: $spacing-01;
+}
+
+// =============================================================================
+// TaskIcon — icon wrapper
+// =============================================================================
+
+.#{$prefix}--task-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: $spacing-05;
+  height: $spacing-05;
+  position: relative;
+  z-index: 1;
+}
+
+.#{$prefix}--task-icon__static {
+  display: inline-flex;
+}
+
+.#{$prefix}--task-icon__spin {
+  display: inline-flex;
+  animation: ptl-icon-spin 1s linear infinite;
+}
+
+@keyframes ptl-icon-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================================================
+// LoadingRing
+// =============================================================================
+
+.#{$prefix}--loading-ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: $spacing-05;
+  height: $spacing-05;
+  line-height: 0;
+}
+
+.#{$prefix}--loading-ring__svg {
+  display: block;
+  width: $spacing-05;
+  height: $spacing-05;
+  overflow: visible;
+}
+
+.#{$prefix}--loading-ring__spinner-group {
+  transform-origin: 8px 8px;
+  animation: ptl-loading-spin 0.72s linear infinite;
+}
+
+@keyframes ptl-loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

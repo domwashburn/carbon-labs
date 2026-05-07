@@ -1749,6 +1749,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@carbon-labs/react-task-drawer@workspace:packages/react/src/components/TaskDrawer":
+  version: 0.0.0-use.local
+  resolution: "@carbon-labs/react-task-drawer@workspace:packages/react/src/components/TaskDrawer"
+  dependencies:
+    "@carbon-labs/utilities": "npm:0.22.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+  languageName: unknown
+  linkType: soft
+
 "@carbon-labs/react-text-highlighter@workspace:packages/react/src/components/TextHighlighter":
   version: 0.0.0-use.local
   resolution: "@carbon-labs/react-text-highlighter@workspace:packages/react/src/components/TextHighlighter"
