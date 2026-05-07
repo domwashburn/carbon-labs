@@ -17,7 +17,8 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'CondensedAttribute displays attribute values in a clean and readable format with expandable field lists.',
+        component:
+          'CondensedAttribute displays attribute values in a clean and readable format with expandable field lists.',
       },
     },
   },
@@ -35,62 +36,131 @@ export default {
 
 const Template = (args) => <CondensedAttribute {...args} />;
 
-export const Default = Template.bind({});
-Default.args = {
-  attribute: {
-    displayLabel: 'Customer Name',
-    type: 'string',
-    hasOverlay: false,
-    isGoverned: null,
+const sampleAddress = [
+  {
+    fieldLabel: 'Address line 1',
+    fieldValue: {
+      string: '11501 Burnet Road',
+      segments: [{ segment: '11501 Burnet Road', comparison: 'isSame' }],
+    },
+    delimiter: ' ',
   },
-  fields: [
-    {
-      fieldLabel: 'First Name',
-      fieldValue: {
-        string: 'John',
-        segments: [{ segment: 'John', comparison: 'isSame' }],
-      },
+  {
+    fieldLabel: 'Address line 2',
+    fieldValue: {
+      string: 'Building 903, Floor 7',
+      segments: [{ segment: 'Building 903, Floor 7', comparison: 'isSame' }],
     },
-    {
-      fieldLabel: 'Last Name',
-      fieldValue: {
-        string: 'Doe',
-        segments: [{ segment: 'Doe', comparison: 'isSame' }],
-      },
+    delimiter: ', ',
+  },
+  {
+    fieldLabel: 'City',
+    fieldValue: {
+      string: 'Austin',
+      segments: [{ segment: 'Austin', comparison: 'isSame' }],
     },
-  ],
+    delimiter: ', ',
+  },
+  {
+    fieldLabel: 'State/Provence',
+    fieldValue: {
+      string: 'TX',
+      segments: [{ segment: 'TX', comparison: 'isSame' }],
+    },
+    delimiter: ' ',
+  },
+  {
+    fieldLabel: 'Postal Code',
+    fieldValue: {
+      string: '78758',
+      segments: [{ segment: '78758', comparison: 'isSame' }],
+    },
+  },
+  {
+    fieldLabel: 'Country',
+    fieldValue: {
+      string: 'United states',
+      segments: [{ segment: 'United states', comparison: 'isSame' }],
+    },
+  },
+];
+
+export const ComplexAttribute = Template.bind({});
+ComplexAttribute.storyName = 'Complex • Default';
+ComplexAttribute.args = {
+  attribute: {
+    displayLabel: 'Business Address',
+    type: 'Address',
+    kind: 'complex',
+  },
+  fields: sampleAddress,
   delimiter: ', ',
   openByDefault: false,
 };
 
-export const OpenByDefault = Template.bind({});
-OpenByDefault.args = {
+export const ComplexAttributeOpen = Template.bind({});
+ComplexAttributeOpen.storyName = 'Complex • Open on load';
+ComplexAttributeOpen.args = {
   attribute: {
-    displayLabel: 'Address',
-    type: 'string',
-    hasOverlay: false,
-    isGoverned: null,
+    displayLabel: 'Legal name',
+    type: 'Name',
+    kind: 'complex',
   },
   fields: [
     {
-      fieldLabel: 'Street',
+      fieldLabel: 'Generation',
       fieldValue: {
-        string: '123 Main St',
-        segments: [{ segment: '123 Main St', comparison: 'isSame' }],
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+    },
+    {
+      fieldLabel: 'Prefix',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ', ',
+    },
+    {
+      fieldLabel: 'Given Name',
+      fieldValue: {
+        string: 'Carl',
+        segments: [{ segment: 'Carl', comparison: 'isSame' }],
+      },
+      delimiter: ', ',
+    },
+    {
+      fieldLabel: 'Middle Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+    },
+    {
+      fieldLabel: 'Last Lame',
+      fieldValue: {
+        string: 'Robertson',
+        segments: [{ segment: 'Robertson', comparison: 'isSame' }],
       },
     },
     {
-      fieldLabel: 'City',
+      fieldLabel: 'Suffix',
       fieldValue: {
-        string: 'New York',
-        segments: [{ segment: 'New York', comparison: 'isSame' }],
+        string: 'Jr.',
+        segments: [
+          { segment: 'J', comparison: 'isDifferent' },
+          { segment: 'r.', comparison: 'isSame' },
+        ],
       },
     },
     {
-      fieldLabel: 'State',
+      fieldLabel: 'Full Name',
       fieldValue: {
-        string: 'NY',
-        segments: [{ segment: 'NY', comparison: 'isSame' }],
+        string: '',
+        segments: [],
       },
     },
   ],
@@ -98,61 +168,340 @@ OpenByDefault.args = {
   openByDefault: true,
 };
 
-export const WithGovernance = Template.bind({});
-WithGovernance.args = {
+export const ComplexAttributeNotGoverned = Template.bind({});
+ComplexAttributeNotGoverned.storyName = 'Complex (No Governance)';
+ComplexAttributeNotGoverned.args = {
   attribute: {
-    displayLabel: 'Social Security Number',
-    type: 'string',
-    hasOverlay: true,
-    isGoverned: 'full',
+    displayLabel: 'Legal name',
+    type: 'Name',
+    kind: 'complex',
+    hasOverlay: false,
+    isGoverned: false,
   },
   fields: [
     {
-      fieldLabel: 'SSN',
+      fieldLabel: 'Generation',
       fieldValue: {
-        string: '***-**-1234',
-        segments: [{ segment: '***-**-1234', comparison: 'isSame' }],
+        string: '',
+        segments: [],
       },
-      hasOverlay: true,
-      isGoverned: 'full',
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Prefix',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Given Name',
+      fieldValue: {
+        string: 'Carl',
+        segments: [{ segment: 'Carl', comparison: 'isSame' }],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Middle Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Last Lame',
+      fieldValue: {
+        string: 'Robertson',
+        segments: [{ segment: 'Robertson', comparison: 'isSame' }],
+      },
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Suffix',
+      fieldValue: {
+        string: 'Jr.',
+        segments: [
+          { segment: 'J', comparison: 'isDifferent' },
+          { segment: 'r.', comparison: 'isSame' },
+        ],
+      },
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Full Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      hasOverlay: false,
+      isGoverned: false,
     },
   ],
-  delimiter: ', ',
-  openByDefault: false,
+  openByDefault: true,
 };
 
-export const WithComparison = Template.bind({});
-WithComparison.args = {
+export const ComplexAttributePartiallyGoverned = Template.bind({});
+ComplexAttributePartiallyGoverned.storyName = 'Complex (Partial Governance)';
+ComplexAttributePartiallyGoverned.args = {
   attribute: {
-    displayLabel: 'Product Name',
-    type: 'string',
+    displayLabel: 'Legal name',
+    type: 'Name',
+    kind: 'complex',
     hasOverlay: false,
     isGoverned: 'partial',
   },
   fields: [
     {
-      fieldLabel: 'Name',
+      fieldLabel: 'Generation',
       fieldValue: {
-        string: 'Carbon Design System',
-        segments: [
-          { segment: 'Carbon', comparison: 'isSame' },
-          { segment: ' Design ', comparison: 'isDifferent' },
-          { segment: 'System', comparison: 'isSame' },
-        ],
+        string: '',
+        segments: [],
       },
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: false,
     },
     {
-      fieldLabel: 'Version',
+      fieldLabel: 'Prefix',
       fieldValue: {
-        string: 'v11.0.0',
+        string: '',
+        segments: [],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Given Name',
+      fieldValue: {
+        string: 'XXXXXX',
+        segments: [],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+    {
+      fieldLabel: 'Middle Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Last Lame',
+      fieldValue: {
+        string: 'Robertson',
+        segments: [{ segment: 'Robertson', comparison: 'isSame' }],
+      },
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Suffix',
+      fieldValue: {
+        string: 'Jr.',
         segments: [
-          { segment: 'v11', comparison: 'isDifferent' },
-          { segment: '.0.0', comparison: 'isSame' },
+          { segment: 'J', comparison: 'isDifferent' },
+          { segment: 'r.', comparison: 'isSame' },
         ],
       },
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Full Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      hasOverlay: false,
+      isGoverned: false,
     },
   ],
-  delimiter: ' • ',
+  openByDefault: true,
+};
+
+export const ComplexAttributeFullyGoverned = Template.bind({});
+ComplexAttributeFullyGoverned.storyName = 'Complex (Full Governance)';
+ComplexAttributeFullyGoverned.args = {
+  attribute: {
+    displayLabel: 'Legal name',
+    type: 'Name',
+    kind: 'complex',
+    hasOverlay: false,
+    isGoverned: 'full',
+  },
+  fields: [
+    {
+      fieldLabel: 'Generation',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+    {
+      fieldLabel: 'Prefix',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+    {
+      fieldLabel: 'Given Name',
+      fieldValue: {
+        string: 'XXXXXXXXX',
+        segments: [],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+    {
+      fieldLabel: 'Middle Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+    {
+      fieldLabel: 'Last Lame',
+      fieldValue: {
+        string: 'XXXXXXXXX',
+        segments: [],
+      },
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+    {
+      fieldLabel: 'Suffix',
+      fieldValue: {
+        string: 'XXXX',
+        segments: [],
+      },
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+    {
+      fieldLabel: 'Full Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      hasOverlay: false,
+      isGoverned: 'full',
+    },
+  ],
+  openByDefault: true,
+};
+
+export const ComplexAttributeWithOverlay = Template.bind({});
+ComplexAttributeWithOverlay.storyName = 'Complex (With Overlay)';
+ComplexAttributeWithOverlay.args = {
+  attribute: {
+    displayLabel: 'Legal name',
+    type: 'Name',
+    kind: 'complex',
+    hasOverlay: true,
+    isGoverned: false,
+  },
+  fields: [
+    {
+      fieldLabel: 'Generation',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Prefix',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Given Name',
+      fieldValue: {
+        string: 'Carl',
+        segments: [{ segment: 'Carl', comparison: 'isSame' }],
+      },
+      delimiter: ', ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Middle Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      delimiter: ' ',
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Last Lame',
+      fieldValue: {
+        string: 'Robertson',
+        segments: [{ segment: 'Robertson', comparison: 'isSame' }],
+      },
+      hasOverlay: false,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Suffix',
+      fieldValue: {
+        string: 'Jr.',
+        segments: [
+          { segment: 'J', comparison: 'isDifferent' },
+          { segment: 'r.', comparison: 'isSame' },
+        ],
+      },
+      hasOverlay: true,
+      isGoverned: false,
+    },
+    {
+      fieldLabel: 'Full Name',
+      fieldValue: {
+        string: '',
+        segments: [],
+      },
+      hasOverlay: false,
+      isGoverned: false,
+    },
+  ],
   openByDefault: true,
 };
 

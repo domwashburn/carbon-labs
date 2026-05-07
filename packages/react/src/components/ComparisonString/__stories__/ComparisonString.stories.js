@@ -39,60 +39,80 @@ export default {
 
 const Template = (args) => <ComparisonString {...args} />;
 
-export const Default = Template.bind({});
-Default.args = {
-  segmentedString: [
-    { segment: 'Hello', comparison: 'isSame' },
-    { segment: ' ', comparison: 'isSame' },
-    { segment: 'World', comparison: 'isDifferent' },
-  ],
+const compareValue = [
+  { segment: 'BE', comparison: 'isSame' },
+  { segment: 'MI', comparison: 'isDifferent' },
+  { segment: 'S', comparison: 'isSame' },
+];
+
+export const CompareOff = Template.bind({});
+CompareOff.storyName = 'Comparison • no highlight';
+CompareOff.args = {
+  segmentedString: compareValue,
   compareMode: false,
-  highlightIsSame: false,
-  highlightIsDifferent: false,
-};
-
-export const CompareMode = Template.bind({});
-CompareMode.args = {
-  segmentedString: [
-    { segment: 'Hello', comparison: 'isSame' },
-    { segment: ' ', comparison: 'isSame' },
-    { segment: 'World', comparison: 'isDifferent' },
-  ],
-  compareMode: true,
-  highlightIsSame: false,
-  highlightIsDifferent: false,
-};
-
-export const HighlightSame = Template.bind({});
-HighlightSame.args = {
-  segmentedString: [
-    { segment: 'Hello', comparison: 'isSame' },
-    { segment: ' ', comparison: 'isSame' },
-    { segment: 'World', comparison: 'isDifferent' },
-  ],
-  compareMode: true,
   highlightIsSame: true,
-  highlightIsDifferent: false,
+  highlightIsDifferent: true,
 };
 
-export const HighlightDifferent = Template.bind({});
-HighlightDifferent.args = {
+export const CompareDifferent = Template.bind({});
+CompareDifferent.storyName = 'Comparison • Highlight differences';
+CompareDifferent.args = {
   segmentedString: [
-    { segment: 'Hello', comparison: 'isSame' },
-    { segment: ' ', comparison: 'isSame' },
-    { segment: 'World', comparison: 'isDifferent' },
+    { segment: 'BE', comparison: 'isSame' },
+    { segment: 'MI', comparison: 'isDifferent' },
+    { segment: 'S', comparison: 'isSame' },
   ],
   compareMode: true,
   highlightIsSame: false,
   highlightIsDifferent: true,
 };
 
-export const HighlightBoth = Template.bind({});
-HighlightBoth.args = {
+export const CompareSame = Template.bind({});
+CompareSame.storyName = 'Comparison • Highlight similarities';
+CompareSame.args = {
   segmentedString: [
-    { segment: 'Hello', comparison: 'isSame' },
-    { segment: ' ', comparison: 'isSame' },
-    { segment: 'World', comparison: 'isDifferent' },
+    { segment: 'BE', comparison: 'isSame' },
+    { segment: 'MI', comparison: 'isDifferent' },
+    { segment: 'S', comparison: 'isSame' },
+  ],
+  compareMode: true,
+  highlightIsSame: true,
+  highlightIsDifferent: false,
+};
+
+export const CompareAll = Template.bind({});
+CompareAll.storyName = 'Comparison • Highlight all';
+CompareAll.args = {
+  segmentedString: [
+    { segment: 'BE', comparison: 'isSame' },
+    { segment: 'MI', comparison: 'isDifferent' },
+    { segment: 'S', comparison: 'isSame' },
+  ],
+  compareMode: true,
+  highlightIsSame: true,
+  highlightIsDifferent: true,
+};
+
+export const CompareNone = Template.bind({});
+CompareNone.storyName = 'Comparison • Highlight neutral';
+CompareNone.args = {
+  segmentedString: [
+    { segment: 'BE', comparison: 'isSame' },
+    { segment: 'MI', comparison: 'isDifferent' },
+    { segment: 'S', comparison: 'isSame' },
+  ],
+  compareMode: true,
+  highlightIsSame: false,
+  highlightIsDifferent: false,
+};
+
+export const CompareLong = Template.bind({});
+CompareLong.args = {
+  segmentedString: [
+    { segment: 'this is a ', comparison: 'isSame' },
+    { segment: 'really long string ', comparison: 'isDifferent' },
+    { segment: 'that should end up wrapping ', comparison: 'isSame' },
+    { segment: "if there isn't enough space ", comparison: 'isDifferent' },
   ],
   compareMode: true,
   highlightIsSame: true,
