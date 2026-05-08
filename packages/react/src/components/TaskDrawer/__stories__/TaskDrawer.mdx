@@ -1,0 +1,165 @@
+import { ArgTypes, Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
+import * as TaskDrawerStories from './TaskDrawer.stories';
+
+<Meta isTemplate />
+
+# TaskDrawer
+
+- **Initiative owner(s):** FILL THIS LINE
+- **Status:** Draft
+- **Target library:** TBD
+- **Target library maintainer(s) / PR Reviewer(s):** N/A
+- **Support channel:** `#carbon-labs`
+
+{/* <!-- START doctoc generated TOC please keep comment here to allow auto update --> */}
+{/* <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE --> */}
+
+> 💡 Check our
+> [Stackblitz](https://stackblitz.com/github/carbon-design-system/carbon-labs/tree/main/examples/react/TaskDrawer)
+> example implementation.
+
+[![Edit carbon-labs](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/carbon-design-system/carbon-labs/tree/main/examples/react/TaskDrawer)
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Getting started](#getting-started)
+- [Stories](#stories)
+  - [Default](#default)
+  - [Expanded](#expanded)
+  - [Generating](#generating)
+  - [Complete](#complete)
+  - [Mixed statuses](#mixed-statuses)
+  - [With mutations](#with-mutations)
+- [Hooks](#hooks)
+- [Component API](#component-api)
+
+{/* <!-- END doctoc generated TOC please keep comment here to allow auto update --> */}
+
+## Overview
+
+TaskDrawer is an expandable in-chat plan and task list component. It sits
+directly above a prompt input field and surfaces the lifecycle of an
+AI-generated plan — from generating through execution to completion.
+
+<Canvas of={TaskDrawerStories.Default} />
+<Controls of={TaskDrawerStories.Default} />
+
+## Getting started
+
+Here's a quick example to get you started.
+
+```bash
+yarn add @carbon/react
+yarn add @carbon-labs/react
+```
+
+### JS (via import)
+
+```javascript
+import {
+  TaskDrawer,
+  useScrollToTask,
+  useTaskMutation,
+  usePlanEntryExit,
+} from '@carbon-labs/react';
+```
+
+**Minimal usage:**
+
+```tsx
+import React from 'react';
+import { TaskDrawer } from '@carbon-labs/react';
+
+function App() {
+  const tasks = [
+    { id: 'task-1', label: 'Set up project scaffolding', status: 'complete' },
+    { id: 'task-2', label: 'Configure CI pipeline', status: 'in_progress' },
+    { id: 'task-3', label: 'Write unit tests', status: 'queued' },
+  ];
+
+  return (
+    <TaskDrawer
+      tasks={tasks}
+      title="Implementation plan"
+      preview="Setting up the project with CI and tests."
+      planStatus="executing"
+    />
+  );
+}
+
+export default App;
+```
+
+### SCSS
+
+In your styles file import:
+
+```scss
+@use '@carbon/react';
+@use '@carbon-labs/react/components/TaskDrawer/components/task-drawer';
+```
+
+## Stories
+
+### Default
+
+Collapsed by default. `planStatus="executing"` with one `in_progress` task and
+the remaining tasks queued.
+
+<Canvas of={TaskDrawerStories.Default} />
+
+### Expanded
+
+`defaultExpanded={true}` — the task list is visible on mount without a
+user interaction.
+
+<Canvas of={TaskDrawerStories.Expanded} />
+
+### Generating
+
+`planStatus="generating"` with all tasks at `generating` status. Task rows
+show shimmer skeleton labels while the plan is being created.
+
+<Canvas of={TaskDrawerStories.Generating} />
+
+### Complete
+
+All tasks are `complete` and `planStatus="complete"`. The "Review" and
+"Dismiss" action buttons appear in the header trailing area. Clicking Dismiss
+removes the drawer from view (the story resets on "Show drawer again").
+
+<Canvas of={TaskDrawerStories.Complete} />
+
+### Mixed statuses
+
+Demonstrates `error`, `recovery`, and `awaiting_input` tasks alongside
+`complete` and `queued` tasks. `planStatus="paused"` shows the Help icon in
+the header.
+
+<Canvas of={TaskDrawerStories.MixedStatuses} />
+
+### With mutations
+
+Uses `useTaskMutation` to tag three queued tasks: `new`, `updated`, and
+`dropped`. The `dropped` task also shows a strikethrough on its label.
+
+<Canvas of={TaskDrawerStories.WithMutations} />
+
+## Hooks
+
+Four companion hooks are exported alongside the component:
+
+| Hook | Returns | Purpose |
+| ---------------------- | ------------------------------------------- | ------------------------------------------------- |
+| `useScrollToTask` | `{ bodyRef, registerItemRef, scrollTo }` | Imperatively scroll to any task by id or keyword |
+| `useTaskMutation` | `{ mutations, mutateTasks }` | Manage `new` / `updated` / `dropped` pill tags |
+| `useTaskStatusUpdate` | `{ displayStatus, isTransitioning }` | Drive 120 ms two-phase status transitions |
+| `usePlanEntryExit` | `{ expanded, handleToggle }` | Control expanded state and auto-expand trigger |
+
+See the [Usage docs](/docs/components-taskdrawer-docs-usage--docs#hooks) for
+full code examples and scroll target reference.
+
+## Component API
+
+<ArgTypes of={TaskDrawerStories} />

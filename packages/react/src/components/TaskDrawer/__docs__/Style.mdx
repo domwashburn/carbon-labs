@@ -1,0 +1,123 @@
+<Meta title="Components/TaskDrawer/Docs/Style" />
+
+## Color
+
+### Header
+
+| Element | State | Property | Color token |
+| ---------------------- | --------- | ---------- | ---------------------- |
+| Toggle button | Default | color | `$icon-secondary` |
+| Toggle button | Hover | background | `$layer-hover-01` |
+| Toggle button | Focus | outline | `$focus` |
+| Title | Default | color | `$text-primary` |
+| Preview | Default | color | `$text-secondary` |
+| Header border | Expanded | border-bottom | `$border-subtle-01` |
+| Header border | Collapsed | border-bottom | Transparent |
+| Status icon | `generating` / `updating` | fill | `$icon-secondary` |
+| Status icon | `paused` | fill | `$support-warning` |
+| Status icon | `executing` | fill | `$interactive` |
+| Status icon | `complete` | fill | `$support-success` |
+| Status icon | `failed` | fill | `$support-error` |
+| "Review" button | Default | color | `$interactive` |
+| "Review" button | Hover | color | `$link-primary-hover` |
+| Dismiss icon button | Default | color | `$icon-secondary` |
+| Dismiss icon button | Hover | background | `$layer-hover-01` |
+
+{/* TODO: add image — task-drawer-style-header-states.png */}
+
+### Task row
+
+| Element | Property | Color token |
+| --------------- | ---------- | ---------------------------------- |
+| Row | background | `$layer-01` |
+| Row | border-bottom | `$border-subtle-01` |
+| Row | focus outline | `$focus` |
+| Index number | color (active statuses) | `$text-secondary` |
+| Index number | color (queued / generating / complete) | `$text-disabled` |
+| Label | color (most statuses) | `$text-primary` |
+| Label | color (`complete` / `queued`) | `$text-disabled` |
+| Label | color (`generating`) | `$text-placeholder` |
+| Row tint gradient | background | Status-dependent (see Usage) |
+| Mutation tag | background | `$tag-background-blue` |
+| Mutation tag | color | `$tag-color-blue` |
+| Skeleton | background | `$skeleton-element` |
+| Skeleton | shimmer | `$layer-hover-01` |
+
+{/* TODO: add image — task-drawer-style-row-states.png */}
+
+## Typography
+
+All task labels and UI text are set in sentence case.
+
+| Element | Type token | Notes |
+| ------------------- | ----------- | -------------------------------------- |
+| Plan title | `$label-01` | Single line, truncated with ellipsis |
+| Preview | `$label-01` | Single line, truncated with ellipsis |
+| Task row label | `$label-01` | Strikethrough for `complete` / `dropped` mutation |
+| Task row index | `$label-01` | Fixed-width, right-aligned column |
+| Mutation tag | `$label-01` | — |
+| "Review" action | `$label-01` | — |
+| Skip link | `$label-01` | Visually hidden until `:focus-visible` |
+
+## Structure
+
+{/* TODO: add image — task-drawer-style-structure.png */}
+
+### Root container
+
+| Property | Value |
+| -------------------- | --------------------- |
+| Border-radius (top) | `$spacing-02` (4 px) |
+| Border-radius (bottom) | 0 |
+| Border width | 1 px |
+
+### Header
+
+| Element | Property | px / rem | Spacing token |
+| ------------------- | -------------- | -------- | -------------- |
+| Toggle button | width | 32 / 2 | `$spacing-07` |
+| Toggle button | height | 32 / 2 | `$spacing-07` |
+| Content wrapper | padding-top | 8 / 0.5 | `$spacing-03` |
+| Content wrapper | padding-bottom | 8 / 0.5 | `$spacing-03` |
+| Content wrapper | padding-right | 8 / 0.5 | `$spacing-03` |
+| Content wrapper | gap | 8 / 0.5 | `$spacing-03` |
+| Status icon | width / height | 16 / 1 | `$spacing-05` |
+
+### Task row
+
+| Element | Property | px / rem | Spacing token |
+| -------------- | -------------- | --------- | -------------- |
+| Row | padding-top | 8 / 0.5 | `$spacing-03` |
+| Row | padding-bottom | 8 / 0.5 | `$spacing-03` |
+| Row | padding-left | 4 / 0.25 | `$spacing-02` |
+| Row | padding-right | 16 / 1 | `$spacing-05` |
+| Row | gap | 8 / 0.5 | `$spacing-03` |
+| Status icon | width / height | 16 / 1 | `$spacing-05` |
+| Index column | width | 24 / 1.5 | `$spacing-06` |
+| Mutation tag | height | 24 / 1.5 | — |
+| Mutation tag | border-radius | 12 / 0.75 | — |
+| Mutation tag | padding-left/right | 8 / 0.5 | `$spacing-03` |
+
+### Body
+
+The body's maximum visible height is set via CSS custom properties:
+
+| Custom property | Value | Notes |
+| ---------------------- | ---------- | ---------------------------------- |
+| `--ptl-row-height` | ≈ 33 px | `$spacing-05` + 2 × `$spacing-03` + 1 px divider |
+| `--ptl-max-body-height` | ≈ 148 px | 4.5 × `--ptl-row-height` — 4.5 rows visible before scrolling |
+
+## Motion
+
+| Animation | Duration | Easing | Trigger |
+| --------------------------- | -------------------------------- | --------------------------------- | ------------------------------ |
+| Drawer mount slide-up | `$duration-moderate-02` (240 ms) | `motion(standard, expressive)` | Component first mounts |
+| Body expand / collapse | `$duration-moderate-02` (240 ms) | `motion(standard, expressive)` | Toggle |
+| Preview animate in / out | `$duration-moderate-02` (240 ms) | `motion(standard, expressive)` | Toggle |
+| Status icon cross-fade | `$duration-fast-02` | `motion(standard, productive)` | `planStatus` change |
+| Spin (generating / updating) | 1 000 ms linear infinite | — | While status is active |
+| Task row fade-in | `$duration-moderate-02` (240 ms) | `motion(standard, expressive)` | First time row enters viewport |
+| Status icon dissolve-out | `$duration-fast-02` (120 ms) | `motion(standard, productive)` | Status change (exit phase) |
+| Status icon dissolve-in | `$duration-moderate-02` (240 ms) | `motion(standard, expressive)` | Status change (enter phase) |
+| Mutation tag scale-in | 150 ms | `motion(standard, expressive)` | Tag added |
+| Skeleton shimmer | 3 000 ms linear infinite | — | While `generating` |

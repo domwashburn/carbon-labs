@@ -1,0 +1,168 @@
+<Meta title="Components/TaskDrawer/Docs/Accessibility" />
+
+<PageDescription>
+
+TaskDrawer is built with screen reader and keyboard accessibility as
+first-class concerns. Landmark navigation, skip links, dynamic
+`aria-label`s, and `inert` management are all built in.
+
+</PageDescription>
+
+<AnchorLinks>
+  <AnchorLink>What Carbon Labs provides</AnchorLink>
+  <AnchorLink>Design recommendations</AnchorLink>
+  <AnchorLink>Development considerations</AnchorLink>
+</AnchorLinks>
+
+## What Carbon Labs provides
+
+### Keyboard interactions
+
+Each interactive element is a tab stop. The task list body is fully removed
+from the tab order while collapsed via the `inert` attribute.
+
+| Key | Element | Action |
+| ------------------- | --------------------------------- | ------------------------------------------ |
+| `Tab` | Header | Focuses the toggle button |
+| `Enter` / `Space` | Toggle button | Expands or collapses the task list |
+| `Tab` | Skip link (`:focus-visible`) | Appears between header and body when the drawer is open and a current task exists |
+| `Enter` / `Space` | Skip link | Jumps focus directly to the current task row |
+| `Tab` | Task row | Moves to the next focusable row |
+| `Shift+Tab` | Task row | Moves to the previous row |
+| `Tab` | "Review" button | Focusable when `planStatus === "complete"` and `onReview` is provided |
+| `Tab` | "Dismiss" button | Focusable when `planStatus === "complete"` and `onDismiss` is provided |
+
+{/* TODO: add image — task-drawer-accessibility-keyboard.png */}
+
+### Landmark and live region
+
+The root element carries `role="region"` and `aria-label={title}`, allowing
+screen reader users to jump to the plan via landmark navigation (e.g. `F6` in
+Windows, VoiceOver rotor, NVDA landmark browse mode).
+
+The task list carries `role="list"` with a dynamic `aria-label` in the format:
+
+> `"{N} task[s][. Task {i}, {label}, is {statusLabel}.]"`
+
+Examples:
+- `"8 tasks. Task 2, Configure CI pipeline, is in progress."`
+- `"3 tasks. Task 1, Initialize project, has an error."`
+- `"5 tasks."`
+
+This label updates whenever the task array changes, surfacing the active task
+count and current task status without requiring the user to navigate into the
+list.
+
+{/* TODO: add image — task-drawer-accessibility-landmark.png */}
+
+### Skip link
+
+A visually-hidden `"Skip to current task: Task N of M, {label}"` `<button>`
+is placed between the header and the body when the drawer is open and a
+current task exists.
+
+The button uses the `clip: rect(0,0,0,0)` visually-hidden technique so it
+remains in the tab order and is announced by screen readers, but stays
+invisible during normal mouse interaction. It becomes visible on
+`:focus-visible` for sighted keyboard users.
+
+On activation, focus moves imperatively to the current task row's root
+element via an internal ref map — no scroll is needed because the current row
+is already in the visible viewport when the drawer is expanded.
+
+### Task row accessibility
+
+Each row's root element carries:
+- `role="listitem"` — participates in the `role="list"` semantics.
+- `tabIndex={0}` — directly focusable without a native interactive element.
+- `aria-label="Task N of M: {label}, {statusLabel}"` — the complete
+  description read as one unit by assistive technology.
+- `aria-current="step"` — on the currently active task (the first task with
+  `in_progress`, `awaiting_input`, or `updating` status, or the first warning
+  task if none is actively in progress).
+
+All inner visual elements — index number, label text, mutation pill, status
+icon — carry `aria-hidden="true"` so assistive technology reads only the
+outer `aria-label` and never double-announces.
+
+The `aria-label` is derived from `task.status` (the true current value), not
+from `displayStatus` (which lags 120 ms during animation), ensuring screen
+reader announcements are always accurate during visual status transitions.
+
+### Collapsed state
+
+When collapsed, the body container has both `aria-hidden="true"` and the
+HTML `inert` attribute applied together:
+
+- `aria-hidden` removes all body descendants from the accessibility tree.
+- `inert` additionally prevents keyboard `Tab` from reaching any focusable
+  children (the `tabIndex={0}` rows) while the drawer is closed.
+
+The skip link is only rendered when the drawer is expanded, so it is never
+reachable from the hidden body.
+
+### Status icon
+
+The status icon slot in the header carries `role="img"` and an `aria-label`
+such as `"Plan generating"`, `"Plan executing"`, `"Plan complete"`, or
+`"Plan failed"`, providing plan phase context without requiring the user to
+infer it from the visual icon.
+
+## Design recommendations
+
+### Announcing task mutations
+
+When tasks are dynamically added or updated while the drawer is open,
+consider wrapping the call site in an `aria-live="polite"` region to announce
+the change — for example, "Plan updated: 2 new tasks added." TaskDrawer does
+not manage a live region for mutation announcements; this is the
+responsibility of the caller.
+
+{/* TODO: add image — task-drawer-accessibility-live.png */}
+
+### Plan title as accessible name
+
+The `title` prop becomes the `role="region"` landmark's accessible name.
+Screen reader users navigating by landmark will hear this value verbatim.
+Avoid generic values like `"Plan 1"` — use a meaningful, specific plan name.
+
+## Development considerations
+
+Keep these considerations in mind if you are modifying Carbon Labs or
+creating a custom component built on top of TaskDrawer:
+
+- The `inert` attribute is passed as `inert=""` (empty string) when collapsed
+  and `undefined` when expanded. This is intentional — React requires a
+  defined value to render the attribute at all, and browsers treat any value
+  as truthy. Do not pass `inert={false}` as that renders `inert="false"`, which
+  browsers still interpret as inert.
+- The skip link uses `clip: rect(0,0,0,0)` (not `display: none` or
+  `visibility: hidden`) so it remains in the tab order and is announced by
+  screen readers.
+- The task list uses `role="list"` on a `<div>` intentionally — task rows are
+  `<div>` elements, so using `<ul>/<li>` would produce invalid HTML. Do not
+  add additional `role="listitem"` wrappers around `TaskRow`; the row root
+  already declares this role.
+- If building a custom scroll integration on top of `useScrollToTask`, pass
+  the returned `bodyRef` to `TaskDrawer`'s `bodyRef` prop so `scrollIntoView`
+  operates within the correct scroll container.
+- The task list `aria-label` is built from `TASK_STATUS_LABELS` — a constants
+  map of human-readable status strings. If you extend `TaskStatus` with new
+  values, add corresponding entries to that map.
+
+### WCAG references
+
+- [4.1.2 Name, Role, Value](https://www.ibm.com/able/requirements/requirements/#4_1_2)
+  — landmark and row labelling
+- [2.1.1 Keyboard](https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html)
+  — all interactions are reachable via keyboard
+- [2.4.3 Focus Order](https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html)
+  — skip link and `inert` collapse behaviour
+- [1.3.1 Info and Relationships](https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html)
+  — list semantics via `role="list"` / `role="listitem"`
+
+## Feedback
+
+Help us improve this component by providing feedback, asking questions, and
+leaving any other comments on
+[GitHub](https://github.com/carbon-design-system/carbon-website/issues/new?assignees=&labels=feedback&template=feedback.md).
