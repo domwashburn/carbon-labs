@@ -6,6 +6,7 @@ interface FLIPOptions {
   currentStepIndex: number;
   duration?: number;
   enabled?: boolean;
+  blockClass?: string;
 }
 
 /**
@@ -28,7 +29,8 @@ export const useFLIPAnimation = ({
   isProcessing,
   currentStepIndex,
   duration = 400,
-  enabled = true
+  enabled = true,
+  blockClass = 'clabs--inline-reasoning-trace',
 }: FLIPOptions) => {
   const firstPositionRef = useRef<DOMRect | null>(null);
   const elementRef = useRef<HTMLElement | null>(null);
@@ -53,7 +55,7 @@ export const useFLIPAnimation = ({
     
     // Find the corresponding step in the expanded list
     const stepInList = document.querySelector(
-      `[data-step-index="${currentStepIndex}"] .${styles.stepNameWrapper}`
+      `[data-step-index="${currentStepIndex}"] .${blockClass}__step-name-wrapper`
     ) as HTMLElement;
     
     if (!processingLabel) {
@@ -136,8 +138,3 @@ export const useFLIPAnimation = ({
   return elementRef;
 };
 
-// Note: This is a placeholder for styles import
-// In actual implementation, this would be imported from the SCSS module
-const styles = {
-  stepNameWrapper: 'stepNameWrapper'
-};

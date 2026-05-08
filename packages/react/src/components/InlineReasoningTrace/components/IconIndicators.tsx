@@ -1,6 +1,6 @@
 import React from 'react';
 import { Rule, RulePartial, WarningAlt } from '@carbon/icons-react';
-import type { IconIndicatorsProps } from '../types.js';
+import type { IconIndicatorsProps } from '../types';
 
 /**
  * IconIndicators component

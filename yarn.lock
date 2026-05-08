@@ -1675,6 +1675,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@carbon-labs/react-inline-reasoning-trace@workspace:packages/react/src/components/InlineReasoningTrace":
+  version: 0.0.0-use.local
+  resolution: "@carbon-labs/react-inline-reasoning-trace@workspace:packages/react/src/components/InlineReasoningTrace"
+  dependencies:
+    "@carbon-labs/utilities": "npm:0.22.0"
+    "@ibm/telemetry-js": "npm:^1.10.2"
+  languageName: unknown
+  linkType: soft
+
 "@carbon-labs/react-processing@workspace:packages/react/src/components/Processing":
   version: 0.0.0-use.local
   resolution: "@carbon-labs/react-processing@workspace:packages/react/src/components/Processing"

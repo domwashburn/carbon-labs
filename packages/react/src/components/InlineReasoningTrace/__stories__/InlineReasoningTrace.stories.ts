@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/react';
 
-import InlineReasoningTrace from '../components/InlineReasoningTrace.js';
+import InlineReasoningTrace from '../components/InlineReasoningTrace';
 import '../components/inline-reasoning-trace.scss';
 
 // ============================================

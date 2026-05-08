@@ -1,21 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import cx from 'classnames';
 import { ChevronDown, ChevronRight } from '@carbon/icons-react';
-import styles from './inline-reasoning-trace.scss';
-import { useFLIPAnimation } from '../useFLIPAnimation.js';
-import type { InlineReasoningTraceProps } from '../types.js';
-import { StepList } from './StepList.js';
-import { ProcessingLabel } from './ProcessingLabel.js';
+import { usePrefix } from '@carbon-labs/utilities/usePrefix';
+import { useFLIPAnimation } from '../useFLIPAnimation';
+import type { InlineReasoningTraceProps } from '../types';
+import { StepList } from './StepList';
+import { ProcessingLabel } from './ProcessingLabel';
 
-/**
- * InlineReasoningTrace component
- *
- * Displays a list of reasoning steps in a clean and readable format.
- * Each step can be expanded to show detailed reasoning content.
- */
-
-// Re-export types for backward compatibility
-export type { TaskType, StepType, InlineReasoningTraceProps } from './types';
+export type { TaskType, StepType, InlineReasoningTraceProps } from '../types';
 
 const InlineReasoningTrace = ({
   steps,
@@ -28,6 +20,8 @@ const InlineReasoningTrace = ({
   currentProcessingStepIndex = 0,
   animationMode = 'flip'
 }: InlineReasoningTraceProps) => {
+  const prefix = usePrefix();
+  const blockClass = `${prefix}--inline-reasoning-trace`;
 
   const [isExpanded, setIsExpanded] = useState(openByDefault);
   const [shouldRender, setShouldRender] = useState(openByDefault);
@@ -37,60 +31,52 @@ const InlineReasoningTrace = ({
   const handleToggle = useCallback(() => {
     setHasBeenToggled(true);
     if (isExpanded) {
-      // Start exit animation
       setIsExiting(true);
-      // Wait for animation to complete before unmounting (240ms for moderate-02)
       setTimeout(() => {
         setIsExpanded(false);
         setShouldRender(false);
         setIsExiting(false);
       }, 240);
     } else {
-      // Expanding - render immediately and animate in
       setIsExpanded(true);
       setShouldRender(true);
     }
   }, [isExpanded]);
 
-  // Get the current processing step
-  const currentProcessingStep = isProcessing && currentProcessingStepIndex < steps.length
-    ? steps[currentProcessingStepIndex]
-    : null;
+  const currentProcessingStep =
+    isProcessing && currentProcessingStepIndex < steps.length
+      ? steps[currentProcessingStepIndex]
+      : null;
 
-  // Use FLIP animation hook when in flip mode
   useFLIPAnimation({
     isExpanded,
     isProcessing,
     currentStepIndex: currentProcessingStepIndex,
     duration: 400,
-    enabled: animationMode === 'flip'
+    enabled: animationMode === 'flip',
+    blockClass,
   });
 
   return (
-    <div className={styles.reasoningTraceList}>
+    <div className={blockClass}>
       <button
-        className={cx(styles.trigger, {
-          [styles.triggerExpanded]: isExpanded
+        className={cx(`${blockClass}__trigger`, {
+          [`${blockClass}__trigger--expanded`]: isExpanded,
         })}
         aria-expanded={isExpanded}
         onClick={handleToggle}
-        style={{ anchorName: '--trigger-anchor' } as React.CSSProperties}
-      >
-        {isExpanded && <span className={styles.nestedIndicator} />}
+        style={{ anchorName: '--trigger-anchor' } as React.CSSProperties}>
+        {isExpanded && <span className={`${blockClass}__nested-indicator`} />}
         <span>{triggerText}</span>
       </button>
-      <span className={styles.chevronIcon}>
+      <span className={`${blockClass}__chevron-icon`}>
         {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
       </span>
-      
-      {/* Processing label shown when collapsed and processing */}
+
       {isProcessing && !isExpanded && currentProcessingStep && (
-        <ProcessingLabel
-          step={currentProcessingStep}
-          animationMode={animationMode}
-        />
+        <ProcessingLabel step={currentProcessingStep} animationMode={animationMode} />
       )}
-      
+
       {shouldRender && (
         <StepList
           steps={steps}
@@ -110,15 +96,13 @@ const InlineReasoningTrace = ({
   );
 };
 
-// Import extracted components
-import { IconIndicators } from './IconIndicators.js';
-import { StepTitle } from './StepTitle.js';
-import { StepContent } from './StepContent.js';
-import { Step } from './Step.js';
-import { StepList as StepListComponent } from './StepList.js';
-import { ProcessingLabel as ProcessingLabelComponent } from './ProcessingLabel.js';
+import { IconIndicators } from './IconIndicators';
+import { StepTitle } from './StepTitle';
+import { StepContent } from './StepContent';
+import { Step } from './Step';
+import { StepList as StepListComponent } from './StepList';
+import { ProcessingLabel as ProcessingLabelComponent } from './ProcessingLabel';
 
-// Attach components to main component for backward compatibility
 InlineReasoningTrace.StepList = StepListComponent;
 InlineReasoningTrace.Step = Step;
 InlineReasoningTrace.StepContent = StepContent;
@@ -126,13 +110,12 @@ InlineReasoningTrace.StepTitle = StepTitle;
 InlineReasoningTrace.ProcessingLabel = ProcessingLabelComponent;
 InlineReasoningTrace.IconIndicators = IconIndicators;
 
-// Export individual components for direct imports
 export {
   StepListComponent as InlineReasoningTraceStepList,
   Step as InlineReasoningTraceStep,
   StepContent as ReasoningStepContent,
   StepTitle as ReasoningTraceStepTitle,
   ProcessingLabelComponent as ProcessingLabel,
-  IconIndicators
+  IconIndicators,
 };
 export default InlineReasoningTrace;
