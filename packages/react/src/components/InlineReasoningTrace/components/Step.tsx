@@ -12,7 +12,6 @@ export const Step: React.FC<StepProps> = ({
   shouldAnimate = true,
   isExiting = false,
   isNotLast = false,
-  animationDelay,
   isHidden = false,
   isProcessing = false,
   currentProcessingStepIndex = 0,
@@ -52,30 +51,14 @@ export const Step: React.FC<StepProps> = ({
       className={cx(`${blockClass}__list-item`, {
         [`${blockClass}__list-item--no-animation`]: !shouldAnimate || isExiting,
         [`${blockClass}__list-item--not-last`]: isNotLast,
+        [`${blockClass}__list-item--hidden`]: isHidden,
       })}
-      data-step-index={index}
-      style={{
-        ...(animationDelay !== undefined ? { animationDelay: `${animationDelay}s` } : {}),
-        ...(isHidden
-          ? {
-              maxHeight: '0',
-              opacity: '0',
-              overflow: 'hidden',
-              transition:
-                'max-height 0.4s cubic-bezier(0.4, 0.14, 0.3, 1), opacity 0.4s cubic-bezier(0.4, 0.14, 0.3, 1)',
-              marginTop: '0',
-              marginBottom: '0',
-            }
-          : {
-              maxHeight: '500px',
-              opacity: '1',
-              transition:
-                'max-height 0.4s cubic-bezier(0.4, 0.14, 0.3, 1), opacity 0.4s cubic-bezier(0.4, 0.14, 0.3, 1)',
-            }),
-      }}>
+      data-step-index={index}>
       <span className={`${blockClass}__nested-indicator`} />
       <div className={`${blockClass}__step-content`}>
-        <div className={`${blockClass}__step-name-wrapper`} data-flip-id={`step-${index}`}>
+        <div
+          className={`${blockClass}__step-name-wrapper`}
+          data-flip-id={`step-${index}`}>
           <StepTitle
             label={step.stepLabel}
             taskType={step.taskType}
@@ -92,6 +75,7 @@ export const Step: React.FC<StepProps> = ({
           />
           {needsShowMore && (
             <button
+              type="button"
               className={`${blockClass}__show-more-button`}
               onClick={handleStepToggle}
               aria-expanded={isStepExpanded}>

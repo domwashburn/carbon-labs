@@ -150,6 +150,31 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
   transition: none;
 }
 
+.#{$prefix}__hidden-steps {
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  opacity: 1;
+  transition: grid-template-rows $duration-moderate-02 $expressive-easing,
+    opacity $duration-moderate-02 $expressive-easing;
+}
+
+.#{$prefix}__hidden-steps-inner {
+  overflow: hidden;
+  min-block-size: 0;
+}
+
+.#{$prefix}__hidden-steps--entering,
+.#{$prefix}__hidden-steps--exiting {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.#{$prefix}__hidden-steps--no-animation {
+  transition: none;
+}
+
 .#{$prefix}__list {
   list-style: none;
   padding: 0;
@@ -161,7 +186,7 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
 .#{$prefix}__list--hidden {
   margin-top: 0;
   padding-top: 0;
-  animation: #{$prefix}-slideIn $duration-moderate-02 $expressive-easing;
+  animation: none;
   transform-origin: top;
 
   &.#{$prefix}__list--no-animation {
@@ -169,7 +194,7 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
   }
 
   &.#{$prefix}__list--exiting {
-    animation: #{$prefix}-slideOut $duration-moderate-02 $expressive-easing;
+    animation: none;
   }
 }
 
@@ -206,6 +231,10 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
 .#{$prefix}__list-item {
   display: flex;
   flex-direction: row;
+  max-height: 500px;
+  opacity: 1;
+  transition: max-height 0.4s $expressive-easing,
+    opacity 0.4s $expressive-easing;
   animation: #{$prefix}-fadeIn $duration-moderate-01 $expressive-easing;
   animation-fill-mode: both;
 
@@ -218,6 +247,14 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
 
 .#{$prefix}__list-item--no-animation {
   animation: none;
+}
+
+.#{$prefix}__list-item--hidden {
+  overflow: hidden;
+  max-height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  opacity: 0;
 }
 
 @keyframes #{$prefix}-fadeIn {

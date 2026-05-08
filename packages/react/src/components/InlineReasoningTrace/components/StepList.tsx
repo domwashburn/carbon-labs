@@ -4,6 +4,9 @@ import { usePrefix } from '@carbon-labs/utilities/usePrefix';
 import type { StepListProps } from '../types';
 import { Step } from './Step';
 
+const hiddenStepsAnimationDuration = 240;
+const hiddenStepsAnimationFallbackDelay = hiddenStepsAnimationDuration + 80;
+
 export const StepList: React.FC<StepListProps> = ({
   steps,
   isExiting,
@@ -20,111 +23,128 @@ export const StepList: React.FC<StepListProps> = ({
 
   const effectiveShowAllStepsByDefault = isProcessing || showAllStepsByDefault;
 
-  const [showAllSteps, setShowAllSteps] = useState(effectiveShowAllStepsByDefault);
+  const [showAllSteps, setShowAllSteps] = useState(
+    effectiveShowAllStepsByDefault
+  );
+  const [isStepsEntering, setIsStepsEntering] = useState(false);
   const [isStepsExiting, setIsStepsExiting] = useState(false);
   const [shouldRenderHiddenSteps, setShouldRenderHiddenSteps] = useState(
     effectiveShowAllStepsByDefault
   );
   const [hasUserToggled, setHasUserToggled] = useState(false);
   const timeoutRef = React.useRef<number | null>(null);
+  const enterAnimationFrameRef = React.useRef<number | null>(null);
   const prevProcessingRef = React.useRef(isProcessing);
+
+  const clearExitTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
+
+  const clearEnterAnimationFrame = useCallback(() => {
+    if (enterAnimationFrameRef.current !== null) {
+      window.cancelAnimationFrame(enterAnimationFrameRef.current);
+      enterAnimationFrameRef.current = null;
+    }
+  }, []);
+
+  const completeHiddenStepsExit = useCallback(() => {
+    clearExitTimeout();
+    clearEnterAnimationFrame();
+    setShowAllSteps(false);
+    setShouldRenderHiddenSteps(false);
+    setIsStepsEntering(false);
+    setIsStepsExiting(false);
+  }, [clearEnterAnimationFrame, clearExitTimeout]);
 
   React.useEffect(() => {
     if (isProcessing && !prevProcessingRef.current && !hasUserToggled) {
+      clearEnterAnimationFrame();
+      clearExitTimeout();
       setShowAllSteps(true);
       setShouldRenderHiddenSteps(true);
+      setIsStepsEntering(false);
+      setIsStepsExiting(false);
     }
     prevProcessingRef.current = isProcessing;
-  }, [isProcessing, hasUserToggled]);
-
-  const shouldShowToggle = effectiveShowAllStepsByDefault
-    ? allowStepCollapse && steps.length > initialVisibleSteps
-    : steps.length > initialVisibleSteps;
+  }, [
+    clearEnterAnimationFrame,
+    clearExitTimeout,
+    isProcessing,
+    hasUserToggled,
+  ]);
 
   const visibleSteps = steps.slice(0, initialVisibleSteps);
   const hiddenSteps = steps.slice(initialVisibleSteps);
+  const hasHiddenSteps = hiddenSteps.length > 0;
+
+  const shouldShowToggle = effectiveShowAllStepsByDefault
+    ? allowStepCollapse && hasHiddenSteps
+    : hasHiddenSteps;
 
   React.useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      clearEnterAnimationFrame();
+      clearExitTimeout();
     };
-  }, []);
+  }, [clearEnterAnimationFrame, clearExitTimeout]);
 
   const handleToggleSteps = useCallback(() => {
     setHasUserToggled(true);
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    clearEnterAnimationFrame();
+    clearExitTimeout();
 
     if (showAllSteps) {
-      const animationDuration = effectiveShowAllStepsByDefault ? 400 : 240;
-
       setIsStepsExiting(true);
-      if (effectiveShowAllStepsByDefault) {
-        setShowAllSteps(false);
-      }
+      setIsStepsEntering(false);
 
-      timeoutRef.current = window.setTimeout(() => {
-        if (!effectiveShowAllStepsByDefault) {
-          setShowAllSteps(false);
-          setShouldRenderHiddenSteps(false);
-        }
-        setIsStepsExiting(false);
-        timeoutRef.current = null;
-      }, animationDuration);
+      timeoutRef.current = window.setTimeout(
+        completeHiddenStepsExit,
+        hiddenStepsAnimationFallbackDelay
+      );
     } else {
       setShowAllSteps(true);
+      setIsStepsEntering(true);
+      setIsStepsExiting(false);
       setShouldRenderHiddenSteps(true);
+      enterAnimationFrameRef.current = window.requestAnimationFrame(() => {
+        enterAnimationFrameRef.current = window.requestAnimationFrame(() => {
+          setIsStepsEntering(false);
+          enterAnimationFrameRef.current = null;
+        });
+      });
     }
-  }, [showAllSteps, effectiveShowAllStepsByDefault]);
+  }, [
+    clearEnterAnimationFrame,
+    clearExitTimeout,
+    completeHiddenStepsExit,
+    showAllSteps,
+  ]);
 
-  if (effectiveShowAllStepsByDefault) {
-    return (
-      <div>
-        <ul
-          className={cx(`${blockClass}__list`, {
-            [`${blockClass}__list--exiting`]: isExiting,
-            [`${blockClass}__list--no-animation`]:
-              isInitialRender || (!shouldAnimate && !isExiting),
-          })}>
-          {steps.map((step, index) => {
-            const isHidden = !showAllSteps && index >= initialVisibleSteps;
-            return (
-              <Step
-                step={step}
-                index={index}
-                key={index}
-                shouldAnimate={shouldAnimate && !isInitialRender}
-                isExiting={isExiting}
-                isHidden={isHidden}
-                isProcessing={isProcessing}
-                currentProcessingStepIndex={currentProcessingStepIndex}
-              />
-            );
-          })}
-          {shouldShowToggle && (
-            <li
-              className={cx(`${blockClass}__list-item`, `${blockClass}__show-more-list-item`, {
-                [`${blockClass}__list-item--no-animation`]: !shouldAnimate || isExiting,
-              })}>
-              <span className={`${blockClass}__nested-indicator`} />
-              <button
-                className={`${blockClass}__show-more-steps-button`}
-                onClick={handleToggleSteps}
-                aria-expanded={showAllSteps}>
-                {showAllSteps
-                  ? 'Show less'
-                  : `Show ${hiddenSteps.length} more step${hiddenSteps.length > 1 ? 's' : ''}`}
-              </button>
-            </li>
-          )}
-        </ul>
-      </div>
-    );
-  }
+  const handleHiddenStepsTransitionEnd = useCallback(
+    (event: React.TransitionEvent<HTMLDivElement>) => {
+      if (
+        isStepsExiting &&
+        event.target === event.currentTarget &&
+        event.propertyName === 'grid-template-rows'
+      ) {
+        completeHiddenStepsExit();
+      }
+    },
+    [completeHiddenStepsExit, isStepsExiting]
+  );
+
+  const toggleButtonLabel = showAllSteps
+    ? 'Show less'
+    : `Show ${hiddenSteps.length} more step${
+        hiddenSteps.length > 1 ? 's' : ''
+      }`;
+
+  const hiddenStepsShouldAnimate =
+    (shouldAnimate && !isInitialRender && !isExiting) ||
+    (hasUserToggled && !isExiting);
 
   return (
     <div>
@@ -141,56 +161,78 @@ export const StepList: React.FC<StepListProps> = ({
             key={index}
             shouldAnimate={shouldAnimate && !isInitialRender}
             isExiting={isExiting}
-            isNotLast={index === visibleSteps.length - 1 && shouldShowToggle}
+            isNotLast={
+              index === visibleSteps.length - 1 &&
+              hasHiddenSteps &&
+              (shouldShowToggle || shouldRenderHiddenSteps)
+            }
             isProcessing={isProcessing}
             currentProcessingStepIndex={currentProcessingStepIndex}
           />
         ))}
-        {shouldShowToggle && !showAllSteps && (
-          <li
-            className={cx(`${blockClass}__list-item`, `${blockClass}__show-more-list-item`, {
-              [`${blockClass}__list-item--no-animation`]: !shouldAnimate || isExiting,
-            })}>
-            <span className={`${blockClass}__nested-indicator`} />
-            <button
-              className={`${blockClass}__show-more-steps-button`}
-              onClick={handleToggleSteps}
-              aria-expanded={showAllSteps}>
-              {`Show ${hiddenSteps.length} more step${hiddenSteps.length > 1 ? 's' : ''}`}
-            </button>
-          </li>
-        )}
       </ul>
-      {shouldShowToggle && shouldRenderHiddenSteps && (
+      {hasHiddenSteps && shouldRenderHiddenSteps && (
+        <div
+          className={cx(`${blockClass}__hidden-steps`, {
+            [`${blockClass}__hidden-steps--entering`]: isStepsEntering,
+            [`${blockClass}__hidden-steps--exiting`]:
+              isStepsExiting || isExiting,
+            [`${blockClass}__hidden-steps--no-animation`]:
+              !hiddenStepsShouldAnimate,
+          })}
+          onTransitionEnd={handleHiddenStepsTransitionEnd}>
+          <div className={`${blockClass}__hidden-steps-inner`}>
+            <ul
+              className={cx(
+                `${blockClass}__list`,
+                `${blockClass}__list--hidden`,
+                {
+                  [`${blockClass}__list--exiting`]: isExiting,
+                  [`${blockClass}__list--no-animation`]:
+                    !hiddenStepsShouldAnimate,
+                }
+              )}>
+              {hiddenSteps.map((step, index) => (
+                <Step
+                  step={step}
+                  index={initialVisibleSteps + index}
+                  key={initialVisibleSteps + index}
+                  shouldAnimate={hiddenStepsShouldAnimate}
+                  isExiting={isExiting}
+                  isNotLast={
+                    index === hiddenSteps.length - 1 && shouldShowToggle
+                  }
+                  isProcessing={isProcessing}
+                  currentProcessingStepIndex={currentProcessingStepIndex}
+                />
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+      {shouldShowToggle && (
         <ul
-          className={cx(`${blockClass}__list`, `${blockClass}__list--hidden`, {
-            [`${blockClass}__list--exiting`]: isStepsExiting || isExiting,
+          className={cx(`${blockClass}__list`, `${blockClass}__list--toggle`, {
+            [`${blockClass}__list--exiting`]: isExiting,
             [`${blockClass}__list--no-animation`]:
-              !shouldAnimate && !isExiting && !isStepsExiting,
+              isInitialRender || !shouldAnimate || isExiting,
           })}>
-          {hiddenSteps.map((step, index) => (
-            <Step
-              step={step}
-              index={initialVisibleSteps + index}
-              key={initialVisibleSteps + index}
-              shouldAnimate={shouldAnimate}
-              isExiting={isExiting || isStepsExiting}
-              animationDelay={(initialVisibleSteps + index + 1) * 0.03}
-              isProcessing={isProcessing}
-              currentProcessingStepIndex={currentProcessingStepIndex}
-            />
-          ))}
           <li
-            className={cx(`${blockClass}__list-item`, `${blockClass}__show-more-list-item`, {
-              [`${blockClass}__list-item--no-animation`]:
-                isStepsExiting || isExiting || !shouldAnimate,
-            })}>
+            className={cx(
+              `${blockClass}__list-item`,
+              `${blockClass}__show-more-list-item`,
+              {
+                [`${blockClass}__list-item--no-animation`]:
+                  !shouldAnimate || isExiting,
+              }
+            )}>
             <span className={`${blockClass}__nested-indicator`} />
             <button
+              type="button"
               className={`${blockClass}__show-more-steps-button`}
               onClick={handleToggleSteps}
               aria-expanded={showAllSteps}>
-              Show less
+              {toggleButtonLabel}
             </button>
           </li>
         </ul>
