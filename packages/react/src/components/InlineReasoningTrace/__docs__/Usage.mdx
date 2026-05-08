@@ -1,0 +1,298 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as InlineReasoningTraceStories from '../__stories__/InlineReasoningTrace.stories';
+import * as InlineReasoningTraceProcessingStories from '../__stories__/InlineReasoningTraceProcessing.stories';
+
+<Meta title="Components/InlineReasoningTrace/Docs/Usage" />
+
+<PageDescription>
+
+The inline reasoning trace component displays an AI model's step-by-step reasoning
+process inline within a response. It gives users transparency into how the model
+arrived at its output through a collapsible, expandable list of labeled steps.
+
+</PageDescription>
+
+<AnchorLinks>
+
+<AnchorLink>Live demo</AnchorLink>
+<AnchorLink>Overview</AnchorLink>
+<AnchorLink>Formatting</AnchorLink>
+<AnchorLink>Content</AnchorLink>
+<AnchorLink>Behaviors</AnchorLink>
+<AnchorLink>Related</AnchorLink>
+<AnchorLink>References</AnchorLink>
+<AnchorLink>Feedback</AnchorLink>
+
+</AnchorLinks>
+
+## Live demo
+
+<Canvas of={InlineReasoningTraceStories.IRT} />
+
+## Overview
+
+The inline reasoning trace component surfaces an AI model's chain-of-thought as a
+sequential, expandable list of steps. It is designed for agent and conversational AI
+interfaces where making the model's reasoning visible builds user trust and supports
+debugging of AI outputs.
+
+Each step consists of a label and an optional content panel. Users can expand
+individual steps to read the detail or collapse the entire trace. Steps can carry
+optional metadata — task type icons, governance indicators, and warning flags — to
+communicate the nature and provenance of each reasoning step.
+
+### When to use
+
+- When the model's reasoning process is meaningful or trust-building for the user,
+  such as in agent UIs, agentic workflows, or AI-assisted decision support.
+- When integrating with systems that stream reasoning steps in real time (use the
+  `isProcessing` prop).
+- When steps contain structured outputs like code blocks or tool call results that
+  benefit from inline display.
+- When governance or provenance metadata must be surfaced alongside reasoning.
+
+### When not to use
+
+- For non-AI step-based flows such as onboarding wizards or checkout flows. Use
+  [ProgressIndicator](https://carbondesignsystem.com/components/progress-indicator/usage)
+  instead.
+- When all steps must always be visible and collapsing is not appropriate. Use a
+  structured list or timeline component instead.
+- When there is only one step with no meaningful label or content. Use
+  [InlineLoading](https://carbondesignsystem.com/components/inline-loading/usage)
+  instead.
+
+## Formatting
+
+### Anatomy
+
+1. **Trigger button** — A full-width toggle button that represents the trace in its
+   collapsed state. Displays the `triggerText` prop (e.g., "5 reasoning steps")
+   alongside a chevron icon. Clicking it expands or collapses the step list.
+2. **Step list** — A vertically stacked list of step items revealed when the trace
+   is expanded.
+3. **Step header** — The clickable row for each step. Contains an optional task type
+   icon on the leading edge, the step label text, and an expand/collapse chevron on
+   the trailing edge.
+4. **Step content panel** — The body of an individual step, revealed when that
+   step's header is clicked. Supports plain text, structured content items (text,
+   code blocks), and custom React nodes. If the content exceeds three lines, a
+   **Show more** inline control appears.
+5. **Processing label** — When `isProcessing` is `true` and the trace is collapsed,
+   the current step's label streams in below the trigger button to indicate
+   in-progress work.
+6. **Show more / Show less control** — Appears below the visible steps when the
+   total number of steps exceeds `initialVisibleSteps`. Expands or collapses the
+   hidden steps.
+7. **Icon indicators** — Small icons shown inside a step header to communicate
+   status. A shield icon indicates governed content (`isGoverned`); a warning icon
+   indicates an anomaly or attention signal (`hasOverlay`).
+
+### Placement
+
+The inline reasoning trace is typically placed between a user prompt and an AI
+response, or inline within the response body. It should sit within the same layout
+column as the response text, not floated or placed in a side panel.
+
+Avoid nesting an inline reasoning trace inside another disclosure component such as
+an accordion panel. Keep the trace at the same level of the content hierarchy as the
+response it belongs to.
+
+## Content
+
+### Trigger text
+
+The `triggerText` prop is the primary label shown in the collapsed trigger button.
+It should:
+
+- Reflect the actual number of reasoning steps (e.g., "3 reasoning steps").
+- Be updated dynamically as steps are added during processing.
+- Be descriptive enough for a screen reader to convey its purpose without surrounding
+  context.
+
+Avoid vague labels like "See more" or "Details".
+
+### Step labels
+
+Step labels (`stepLabel`) are the heading for each reasoning step. They should:
+
+- Be short and written in sentence case (e.g., "Analyzing requirements").
+- Use a verb phrase that describes what the step did, not its result.
+- Be unique within a single trace so users can distinguish between steps at a glance.
+
+### Step content
+
+Step content (`stepContent`) can be provided in three forms:
+
+**Plain string or React node** — For simple text or app-authored JSX. Suitable when
+the content is rendered directly by the application and does not need to be stored
+as serializable data.
+
+**Structured content items (`StepContentItem[]`)** — Use when step content is
+produced by an LLM as a serializable response or passed through a schema validator
+(e.g., LangChain structured output). Three item types are supported:
+
+| Item type | Shape | Use for |
+| --------- | ----- | ------- |
+| `text` | `{ type: 'text'; content: string }` | Plain narrative text from the model |
+| `code` | `{ type: 'code'; code: string; language?: string; label?: string }` | Code, tool call output, or command output |
+| `custom` | `{ type: 'custom'; content: React.ReactNode }` | App-authored JSX that cannot be serialized |
+
+Use `text` and `code` items for LLM-generated output to keep step data serializable.
+Reserve `custom` for app-authored content that requires React-specific rendering and
+is not expected to be stored or transmitted as JSON.
+
+<Canvas of={InlineReasoningTraceStories.IRTWithStructuredContent} />
+
+### Task type icons
+
+Use the `taskType` prop on a step to attach a recognizable icon that communicates
+what kind of work that step represents.
+
+**Development tasks** — for agentic coding, build, or deployment workflows:
+
+| Value | Meaning |
+| ----- | ------- |
+| `build` | Compile or build |
+| `create` | Create a new file or resource |
+| `edit` | Modify an existing file |
+| `update` | Update or refresh a resource |
+| `run` | Execute a script or process |
+| `test` | Run tests |
+| `deploy` | Deploy or publish |
+| `misc` | General or uncategorized task |
+
+**Reasoning tasks** — for cognitive or analytical AI workflows:
+
+| Value | Meaning |
+| ----- | ------- |
+| `thinking` | Considering the problem |
+| `analyzing` | Breaking down requirements or data |
+| `searching` | Querying a knowledge base or tool |
+| `reviewing` | Examining output or prior work |
+| `validating` | Checking correctness or constraints |
+| `planning` | Forming a structured plan |
+| `executing` | Carrying out a planned action |
+| `reasoning` | Synthesizing conclusions |
+
+<Canvas of={InlineReasoningTraceStories.IRTWithReasoningIcons} />
+
+<Canvas of={InlineReasoningTraceStories.IRTWithTaskTypeIcons} />
+
+You may also provide a fully custom icon via the `customIcon` prop on a step, which
+overrides `taskType`.
+
+### Governance indicators
+
+Use governance indicators when reasoning steps interact with governed data sources or
+access-controlled systems.
+
+- **`isGoverned="full"`** — The step's output is fully governed. A filled shield
+  icon is shown in the step header.
+- **`isGoverned="partial"`** — The step's output is partially governed. A partial
+  shield icon is shown.
+- **`isGoverned={false}`** — No governance indicator is shown (default).
+- **`hasOverlay={true}`** — A warning icon is shown in the step header, indicating
+  an anomaly, unexpected result, or item requiring attention.
+
+<Canvas of={InlineReasoningTraceStories.IRTWithGovernedStep} />
+
+<Canvas of={InlineReasoningTraceStories.IRTWithStatusIcon} />
+
+## Behaviors
+
+### States
+
+The inline reasoning trace has four primary states:
+
+| State | Description |
+| ----- | ----------- |
+| **Collapsed** | Default. The trigger button is visible; the step list is hidden. |
+| **Expanded** | The step list is revealed. Individual steps may be expanded or collapsed independently. |
+| **Processing – collapsed** | `isProcessing` is `true` and the trace is collapsed. The current step label streams in below the trigger. |
+| **Processing – expanded** | `isProcessing` is `true` and the trace is expanded. The current step label animates with a gradient shimmer to indicate active work. |
+
+Use `openByDefault` to start the component in the expanded state on mount.
+
+### Step visibility
+
+When a trace contains more steps than `initialVisibleSteps` (default: `5`), the
+remaining steps are hidden and a **Show more** control appears at the bottom of the
+visible list. Clicking it reveals the remaining steps and replaces the control with
+**Show less** (when `allowStepCollapse` is `true`).
+
+Use `showAllStepsByDefault` to bypass the initial limit and show all steps as soon
+as the trace opens. This is automatically enabled during processing to keep the
+active step in view.
+
+<Canvas of={InlineReasoningTraceStories.IRTWithManySteps} />
+
+### Processing state
+
+When `isProcessing` is `true`:
+
+- The step at `currentProcessingStepIndex` is in the active processing state. All
+  previous steps are treated as completed.
+- Only the last step in the array should be processing. Set
+  `currentProcessingStepIndex` to `steps.length - 1` as new steps are appended
+  during streaming.
+- When collapsed, the current step label appears below the trigger and streams in
+  character-by-character.
+- When expanded, the current step label pulses with a gradient shimmer animation.
+
+<Canvas of={InlineReasoningTraceProcessingStories.ProcessingCollapsed} />
+
+<Canvas of={InlineReasoningTraceProcessingStories.ProcessingExpanded} />
+
+### Animation modes
+
+The component supports two animation modes for processing state transitions, set via
+the `animationMode` prop:
+
+**FLIP (default)** — Uses the FLIP technique (First, Last, Invert, Play) to
+smoothly animate the active step label between its position in the collapsed
+processing label and its position in the expanded step list. This produces fluid,
+GPU-accelerated position transitions.
+
+**Fade** — Uses a simple opacity transition. Suitable as a fallback or when reduced
+motion is preferred. Set `animationMode="fade"` to use this mode.
+
+### Mouse interactions
+
+- Clicking anywhere on the trigger button expands or collapses the step list.
+- Clicking anywhere on a step header expands or collapses that step's content panel.
+- Clicking **Show more** / **Show less** reveals or hides the overflowing steps.
+- Clicking **Show more** / **Show less** within a step content panel reveals or
+  hides the clipped content.
+
+### Keyboard interactions
+
+| Key | Interaction |
+| --- | ----------- |
+| `Tab` | Moves focus to the next interactive element (trigger, step headers, Show more/less controls) |
+| `Shift+Tab` | Moves focus to the previous interactive element |
+| `Enter` / `Space` | Activates the focused trigger button or step header |
+
+## Related
+
+- [Accordion](https://carbondesignsystem.com/components/accordion/usage) — General
+  purpose collapsible content sections; use for non-AI structured content.
+- [ProgressIndicator](https://carbondesignsystem.com/components/progress-indicator/usage) —
+  Ordered multi-step task progress for human-driven workflows.
+- [InlineLoading](https://carbondesignsystem.com/components/inline-loading/usage) —
+  Simple loading indicator for short in-progress states without step detail.
+- [Tag](https://carbondesignsystem.com/components/tag/usage) — Status labeling;
+  analogous to governance indicators when used outside the trace context.
+
+## References
+
+- IBM Design,
+  [AI Design Guidelines](https://www.ibm.com/design/ai/)
+- Nielsen Norman Group,
+  [Transparency in AI: How to Explain AI Decisions to Users](https://www.nngroup.com/articles/ai-transparency/)
+
+## Feedback
+
+Help us improve this component by providing feedback, asking questions, and leaving
+any other comments on
+[GitHub](https://github.com/carbon-design-system/carbon-labs/issues/new?assignees=&labels=feedback&template=feedback.md).

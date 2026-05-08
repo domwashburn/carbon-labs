@@ -1,0 +1,94 @@
+<Meta title="Components/InlineReasoningTrace/Docs/Accessibility" />
+
+<PageDescription>
+
+The inline reasoning trace component is built to support keyboard navigation and
+screen reader announcements for state changes. Some instances require design
+annotations as noted below.
+
+</PageDescription>
+
+<AnchorLinks>
+  <AnchorLink>What Carbon provides</AnchorLink>
+  <AnchorLink>Design recommendations</AnchorLink>
+  <AnchorLink>Development considerations</AnchorLink>
+</AnchorLinks>
+
+## What Carbon provides
+
+### Keyboard interactions
+
+The trigger button and each step header are keyboard tab stops. The `Space` and
+`Enter` keys activate the focused control, toggling the expanded or collapsed state.
+Interactive elements within expanded step content panels — such as links or code
+copy buttons — are integrated into the tab order automatically when the panel opens.
+
+| Key | Interaction |
+| --- | ----------- |
+| `Tab` | Moves focus forward through the trigger button, step headers, Show more/less controls, and interactive content within open steps |
+| `Shift+Tab` | Moves focus backward through the same sequence |
+| `Enter` / `Space` | Expands or collapses the focused trigger or step header |
+
+### State announcements
+
+The expanded and collapsed state of the trigger is conveyed programmatically via
+`aria-expanded` on the trigger button, eliminating the need for designers to provide
+text equivalents for the chevron icon.
+
+During processing, the processing label region uses `aria-live="polite"` to
+announce the current step label to screen reader users as it updates.
+
+## Design recommendations
+
+### Trigger text
+
+The `triggerText` prop serves as the accessible label for the trigger button. Ensure
+it is descriptive on its own — for example, "5 reasoning steps" — rather than
+generic text like "See more" or "Details", which lack context when encountered in
+screen reader navigation.
+
+### Governance and warning icons
+
+The governance shield icon and the warning icon convey meaning that is not available
+in the step label text. Annotate designs with the intended accessible label for
+these icons when the product context may be unfamiliar to users or assistive
+technology users. For example:
+
+- Full governance icon → "Governed content"
+- Warning icon → "Anomaly detected"
+
+Provide these labels to developers so they can supply appropriate `aria-label` or
+`title` values on the icon elements.
+
+### Processing label
+
+The character-by-character streaming animation on the processing label is a visual
+effect only. Ensure that the step label text is provided as static text within the
+`aria-live` region so screen readers announce the complete label rather than partial
+character sequences mid-stream.
+
+## Development considerations
+
+Keep these considerations in mind when implementing or customizing the component:
+
+- The trigger button has an implicit `role="button"` and carries `aria-expanded`
+  set to `"true"` or `"false"` depending on the open state.
+- Each step header similarly carries `aria-expanded` and an `aria-controls`
+  attribute pointing to the unique id of the step content panel it controls.
+- The step list container should use `role="list"` with each step using
+  `role="listitem"` to give screen reader users structural context about the
+  number and grouping of steps.
+- The processing label region should use `aria-live="polite"` and
+  `aria-atomic="false"` so that each step label update is announced without
+  interrupting in-progress screen reader output.
+- FLIP animation uses CSS `transform` properties and does not alter DOM order, so
+  the tab sequence remains stable during open/close transitions. Verify with
+  keyboard-only navigation that focus is not lost or displaced when the trace is
+  toggled while processing.
+- For reduced-motion environments, the component should respect the
+  `prefers-reduced-motion` media query by disabling or simplifying the FLIP and
+  streaming text animations. Custom animation overrides should check this query
+  before applying motion.
+- See the
+  [ARIA Disclosure Navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/)
+  for additional reference guidance on accessible collapsible content.

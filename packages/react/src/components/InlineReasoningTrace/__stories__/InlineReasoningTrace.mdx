@@ -65,6 +65,30 @@ const steps = [
     stepContent: 'Identified three distinct patterns...',
     taskType: 'searching',
   },
+  {
+    stepLabel: 'Structured Output',
+    stepContent: [
+      {
+        type: 'text',
+        content: 'This item can come from a JSON-schema-compatible response.',
+      },
+      {
+        type: 'code',
+        language: 'ts',
+        label: 'Example',
+        code: 'const status = "ready";',
+      },
+    ],
+    taskType: 'reasoning',
+  },
+  {
+    stepLabel: 'React Slot',
+    stepContent: (
+      <span>
+        App-authored JSX still works for <strong>custom rendering</strong>.
+      </span>
+    ),
+  },
 ];
 
 function MyComponent() {
@@ -96,14 +120,27 @@ function MyComponent() {
 
 ### StepType
 
-| Property      | Type                | Description                                                 |
-| ------------- | ------------------- | ----------------------------------------------------------- |
-| `stepLabel`   | `string`            | Label for the reasoning step                                |
-| `stepContent` | `React.ReactNode`   | Content of the step (can be string, JSX, or any React node) |
-| `taskType`    | `TaskType`          | Type of task (shows corresponding icon)                     |
-| `customIcon`  | `React.ReactNode`   | Custom icon to display instead of task type icon            |
-| `hasOverlay`  | `boolean`           | Show warning overlay for this step                          |
-| `isGoverned`  | `string \| boolean` | Governance level ("full", "partial", false)                 |
+| Property      | Type                                   | Description                                                                           |
+| ------------- | -------------------------------------- | ------------------------------------------------------------------------------------- |
+| `stepLabel`   | `string`                               | Label for the reasoning step                                                          |
+| `stepContent` | `React.ReactNode \| StepContentItem[]` | Content of the step (can be string, JSX, any React node, or structured content items) |
+| `taskType`    | `TaskType`                             | Type of task (shows corresponding icon)                                               |
+| `customIcon`  | `React.ReactNode`                      | Custom icon to display instead of task type icon                                      |
+| `hasOverlay`  | `boolean`                              | Show warning overlay for this step                                                    |
+| `isGoverned`  | `string \| boolean`                    | Governance level ("full", "partial", false)                                           |
+
+### StepContentItem
+
+Use structured step content when responses need to be serializable, schema
+validated, or coerced into objects by tools such as LangChain. `text` and `code`
+items are JSON-friendly. `custom` is a React-only escape hatch for app-authored
+content and is not intended for LLM object output.
+
+| Item   | Type                                                                | Description               |
+| ------ | ------------------------------------------------------------------- | ------------------------- |
+| Text   | `{ type: 'text'; content: string }`                                 | Plain text content        |
+| Code   | `{ type: 'code'; code: string; language?: string; label?: string }` | Carbon code block content |
+| Custom | `{ type: 'custom'; content: React.ReactNode }`                      | React-only custom content |
 
 ### Task Types
 
