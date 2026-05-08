@@ -125,6 +125,30 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
   padding-left: 0;
 }
 
+.#{$prefix}__content {
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  opacity: 1;
+  transition: grid-template-rows $duration-moderate-02 $expressive-easing,
+    opacity $duration-moderate-02 $expressive-easing;
+
+  > * {
+    overflow: hidden;
+    min-block-size: 0;
+  }
+}
+
+.#{$prefix}__content--exiting {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.#{$prefix}__content--no-animation {
+  transition: none;
+}
+
 .#{$prefix}__list {
   list-style: none;
   padding: 0;
@@ -267,9 +291,15 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
 }
 
 @keyframes #{$prefix}-aiGradientShimmer {
-  0%   { background-position: 200% 0; }
-  50%  { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  50% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -297,11 +327,21 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
 }
 
 @keyframes #{$prefix}-iconColorCycle {
-  0%   { color: #0072c3; }
-  25%  { color: #1192e8; }
-  50%  { color: #8a3ffc; }
-  75%  { color: #1192e8; }
-  100% { color: #0072c3; }
+  0% {
+    color: #0072c3;
+  }
+  25% {
+    color: #1192e8;
+  }
+  50% {
+    color: #8a3ffc;
+  }
+  75% {
+    color: #1192e8;
+  }
+  100% {
+    color: #0072c3;
+  }
 }
 
 .#{$prefix}__task-icon {
@@ -442,7 +482,7 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
 .#{$prefix}__processing-label--flip {
   animation: none;
   transition: transform $duration-moderate-02 $expressive-easing,
-              opacity $duration-moderate-02 $expressive-easing;
+    opacity $duration-moderate-02 $expressive-easing;
 }
 
 .#{$prefix}__processing-label--flip[data-flip-animating='true'] {

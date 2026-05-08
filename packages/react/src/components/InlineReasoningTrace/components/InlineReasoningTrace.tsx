@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import cx from 'classnames';
 import { ChevronDown, ChevronRight } from '@carbon/icons-react';
 import { usePrefix } from '@carbon-labs/utilities/usePrefix';
@@ -9,6 +9,9 @@ import { ProcessingLabel } from './ProcessingLabel';
 
 export type { TaskType, StepType, InlineReasoningTraceProps } from '../types';
 
+const exitAnimationDuration = 240;
+const exitAnimationFallbackDelay = exitAnimationDuration + 80;
+
 const InlineReasoningTrace = ({
   steps,
   triggerText,
@@ -18,7 +21,7 @@ const InlineReasoningTrace = ({
   allowStepCollapse = true,
   isProcessing = false,
   currentProcessingStepIndex = 0,
-  animationMode = 'flip'
+  animationMode = 'flip',
 }: InlineReasoningTraceProps) => {
   const prefix = usePrefix();
   const blockClass = `${prefix}--inline-reasoning-trace`;
@@ -27,21 +30,55 @@ const InlineReasoningTrace = ({
   const [shouldRender, setShouldRender] = useState(openByDefault);
   const [isExiting, setIsExiting] = useState(false);
   const [hasBeenToggled, setHasBeenToggled] = useState(false);
+  const exitTimeoutRef = useRef<number | null>(null);
+
+  const clearExitTimeout = useCallback(() => {
+    if (exitTimeoutRef.current !== null) {
+      window.clearTimeout(exitTimeoutRef.current);
+      exitTimeoutRef.current = null;
+    }
+  }, []);
+
+  const completeExit = useCallback(() => {
+    clearExitTimeout();
+    setIsExpanded(false);
+    setShouldRender(false);
+    setIsExiting(false);
+  }, [clearExitTimeout]);
 
   const handleToggle = useCallback(() => {
     setHasBeenToggled(true);
     if (isExpanded) {
+      clearExitTimeout();
       setIsExiting(true);
-      setTimeout(() => {
-        setIsExpanded(false);
-        setShouldRender(false);
-        setIsExiting(false);
-      }, 240);
+      exitTimeoutRef.current = window.setTimeout(
+        completeExit,
+        exitAnimationFallbackDelay
+      );
     } else {
+      clearExitTimeout();
+      setIsExiting(false);
       setIsExpanded(true);
       setShouldRender(true);
     }
-  }, [isExpanded]);
+  }, [clearExitTimeout, completeExit, isExpanded]);
+
+  useEffect(() => {
+    return clearExitTimeout;
+  }, [clearExitTimeout]);
+
+  const handleContentTransitionEnd = useCallback(
+    (event: React.TransitionEvent<HTMLDivElement>) => {
+      if (
+        isExiting &&
+        event.target === event.currentTarget &&
+        event.propertyName === 'grid-template-rows'
+      ) {
+        completeExit();
+      }
+    },
+    [completeExit, isExiting]
+  );
 
   const currentProcessingStep =
     isProcessing && currentProcessingStepIndex < steps.length
@@ -60,12 +97,12 @@ const InlineReasoningTrace = ({
   return (
     <div className={blockClass}>
       <button
+        type="button"
         className={cx(`${blockClass}__trigger`, {
           [`${blockClass}__trigger--expanded`]: isExpanded,
         })}
         aria-expanded={isExpanded}
-        onClick={handleToggle}
-        style={{ anchorName: '--trigger-anchor' } as React.CSSProperties}>
+        onClick={handleToggle}>
         {isExpanded && <span className={`${blockClass}__nested-indicator`} />}
         <span>{triggerText}</span>
       </button>
@@ -74,23 +111,34 @@ const InlineReasoningTrace = ({
       </span>
 
       {isProcessing && !isExpanded && currentProcessingStep && (
-        <ProcessingLabel step={currentProcessingStep} animationMode={animationMode} />
+        <ProcessingLabel
+          step={currentProcessingStep}
+          animationMode={animationMode}
+        />
       )}
 
       {shouldRender && (
-        <StepList
-          steps={steps}
-          isExpanded={isExpanded}
-          isExiting={isExiting}
-          shouldAnimate={hasBeenToggled}
-          isInitialRender={!hasBeenToggled && openByDefault}
-          initialVisibleSteps={initialVisibleSteps}
-          showAllStepsByDefault={showAllStepsByDefault}
-          allowStepCollapse={allowStepCollapse}
-          isProcessing={isProcessing}
-          currentProcessingStepIndex={currentProcessingStepIndex}
-          animationMode={animationMode}
-        />
+        <div
+          className={cx(`${blockClass}__content`, {
+            [`${blockClass}__content--exiting`]: isExiting,
+            [`${blockClass}__content--no-animation`]:
+              !hasBeenToggled && openByDefault,
+          })}
+          onTransitionEnd={handleContentTransitionEnd}>
+          <StepList
+            steps={steps}
+            isExpanded={isExpanded}
+            isExiting={isExiting}
+            shouldAnimate={hasBeenToggled}
+            isInitialRender={!hasBeenToggled && openByDefault}
+            initialVisibleSteps={initialVisibleSteps}
+            showAllStepsByDefault={showAllStepsByDefault}
+            allowStepCollapse={allowStepCollapse}
+            isProcessing={isProcessing}
+            currentProcessingStepIndex={currentProcessingStepIndex}
+            animationMode={animationMode}
+          />
+        </div>
       )}
     </div>
   );
