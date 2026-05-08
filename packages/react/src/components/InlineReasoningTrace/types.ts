@@ -66,6 +66,7 @@ export interface StepListProps {
   isProcessing?: boolean;
   currentProcessingStepIndex?: number;
   animationMode?: 'fade' | 'flip';
+  suppressListAnimations?: boolean;
 }
 
 export interface StepProps {

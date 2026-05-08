@@ -176,6 +176,7 @@ const InlineReasoningTrace = ({
             isProcessing={isProcessing}
             currentProcessingStepIndex={currentProcessingStepIndex}
             animationMode={animationMode}
+            suppressListAnimations={isEntering || isExiting}
           />
         </div>
       )}

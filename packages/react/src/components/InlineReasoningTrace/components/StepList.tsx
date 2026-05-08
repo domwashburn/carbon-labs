@@ -17,6 +17,7 @@ export const StepList: React.FC<StepListProps> = ({
   allowStepCollapse = true,
   isProcessing = false,
   currentProcessingStepIndex = 0,
+  suppressListAnimations = false,
 }) => {
   const prefix = usePrefix();
   const blockClass = `${prefix}--inline-reasoning-trace`;
@@ -35,6 +36,9 @@ export const StepList: React.FC<StepListProps> = ({
   const timeoutRef = React.useRef<number | null>(null);
   const enterAnimationFrameRef = React.useRef<number | null>(null);
   const prevProcessingRef = React.useRef(isProcessing);
+  const suppressInitialListAnimationsRef = React.useRef(
+    suppressListAnimations
+  );
 
   const clearExitTimeout = useCallback(() => {
     if (timeoutRef.current) {
@@ -145,21 +149,25 @@ export const StepList: React.FC<StepListProps> = ({
   const hiddenStepsShouldAnimate =
     (shouldAnimate && !isInitialRender && !isExiting) ||
     (hasUserToggled && !isExiting);
+  const shouldAnimateListItems =
+    shouldAnimate &&
+    !isInitialRender &&
+    !isExiting &&
+    !suppressInitialListAnimationsRef.current;
 
   return (
     <div>
       <ul
         className={cx(`${blockClass}__list`, {
-          [`${blockClass}__list--exiting`]: isExiting,
           [`${blockClass}__list--no-animation`]:
-            isInitialRender || (!shouldAnimate && !isExiting),
+            !shouldAnimateListItems,
         })}>
         {visibleSteps.map((step, index) => (
           <Step
             step={step}
             index={index}
             key={index}
-            shouldAnimate={shouldAnimate && !isInitialRender}
+            shouldAnimate={shouldAnimateListItems}
             isExiting={isExiting}
             isNotLast={
               index === visibleSteps.length - 1 &&
@@ -175,8 +183,7 @@ export const StepList: React.FC<StepListProps> = ({
         <div
           className={cx(`${blockClass}__hidden-steps`, {
             [`${blockClass}__hidden-steps--entering`]: isStepsEntering,
-            [`${blockClass}__hidden-steps--exiting`]:
-              isStepsExiting || isExiting,
+            [`${blockClass}__hidden-steps--exiting`]: isStepsExiting,
             [`${blockClass}__hidden-steps--no-animation`]:
               !hiddenStepsShouldAnimate,
           })}
@@ -187,9 +194,8 @@ export const StepList: React.FC<StepListProps> = ({
                 `${blockClass}__list`,
                 `${blockClass}__list--hidden`,
                 {
-                  [`${blockClass}__list--exiting`]: isExiting,
                   [`${blockClass}__list--no-animation`]:
-                    !hiddenStepsShouldAnimate,
+                    !shouldAnimateListItems,
                 }
               )}>
               {hiddenSteps.map((step, index) => (
@@ -197,7 +203,7 @@ export const StepList: React.FC<StepListProps> = ({
                   step={step}
                   index={initialVisibleSteps + index}
                   key={initialVisibleSteps + index}
-                  shouldAnimate={hiddenStepsShouldAnimate}
+                  shouldAnimate={shouldAnimateListItems}
                   isExiting={isExiting}
                   isNotLast={
                     index === hiddenSteps.length - 1 && shouldShowToggle
@@ -213,9 +219,8 @@ export const StepList: React.FC<StepListProps> = ({
       {shouldShowToggle && (
         <ul
           className={cx(`${blockClass}__list`, `${blockClass}__list--toggle`, {
-            [`${blockClass}__list--exiting`]: isExiting,
             [`${blockClass}__list--no-animation`]:
-              isInitialRender || !shouldAnimate || isExiting,
+              !shouldAnimateListItems,
           })}>
           <li
             className={cx(

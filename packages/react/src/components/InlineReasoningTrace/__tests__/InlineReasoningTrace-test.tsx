@@ -70,6 +70,40 @@ describe('InlineReasoningTrace', () => {
     );
   });
 
+  it('suppresses split list animations when collapsing the full trace', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <InlineReasoningTrace
+        triggerText="Reasoning steps"
+        steps={steps}
+        openByDefault
+        showAllStepsByDefault
+        initialVisibleSteps={2}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Reasoning steps' }));
+
+    const hiddenSteps = container.querySelector(
+      '.clabs--inline-reasoning-trace__hidden-steps'
+    );
+    const lists = container.querySelectorAll(
+      '.clabs--inline-reasoning-trace__list'
+    );
+
+    expect(hiddenSteps).not.toHaveClass(
+      'clabs--inline-reasoning-trace__hidden-steps--exiting'
+    );
+    lists.forEach((list) => {
+      expect(list).toHaveClass(
+        'clabs--inline-reasoning-trace__list--no-animation'
+      );
+      expect(list).not.toHaveClass(
+        'clabs--inline-reasoning-trace__list--exiting'
+      );
+    });
+  });
+
   it('keeps hidden steps mounted until the show less transition completes', async () => {
     const user = userEvent.setup();
     const { container } = render(
