@@ -4,7 +4,10 @@ import { usePrefix } from '@carbon-labs/utilities/usePrefix';
 import type { ProcessingLabelProps } from '../types';
 import { StepTitle } from './StepTitle';
 
-export const ProcessingLabel: React.FC<ProcessingLabelProps> = ({ step, animationMode }) => {
+export const ProcessingLabel: React.FC<ProcessingLabelProps> = ({
+  step,
+  animationMode,
+}) => {
   const prefix = usePrefix();
   const blockClass = `${prefix}--inline-reasoning-trace`;
 
@@ -16,16 +19,24 @@ export const ProcessingLabel: React.FC<ProcessingLabelProps> = ({ step, animatio
       className={cx(`${blockClass}__processing-label`, {
         [`${blockClass}__processing-label--fade`]: animationMode === 'fade',
         [`${blockClass}__processing-label--flip`]: animationMode === 'flip',
-      })}
-      data-flip-id={`processing-step-${step.stepLabel}`}>
-      <span className={`${blockClass}__nested-indicator`} style={{ opacity: 0 }} />
+      })}>
+      <span
+        className={cx(
+          `${blockClass}__nested-indicator`,
+          `${blockClass}__processing-label-indicator`
+        )}
+      />
       <div className={`${blockClass}__processing-label-content`}>
-        <StepTitle
-          label={step.stepLabel}
-          taskType={step.taskType}
-          customIcon={step.customIcon}
-          isProcessing={true}
-        />
+        <div
+          className={`${blockClass}__processing-label-title`}
+          data-flip-id={`processing-step-${step.stepLabel}`}>
+          <StepTitle
+            label={step.stepLabel}
+            taskType={step.taskType}
+            customIcon={step.customIcon}
+            isProcessing={true}
+          />
+        </div>
       </div>
     </div>
   );

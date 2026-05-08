@@ -1,4 +1,5 @@
-import { useRef, useEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import type { RefObject } from 'react';
 
 interface FLIPOptions {
   isExpanded: boolean;
@@ -7,22 +8,28 @@ interface FLIPOptions {
   duration?: number;
   enabled?: boolean;
   blockClass?: string;
+  containerRef?: RefObject<HTMLElement>;
 }
 
+interface FLIPState {
+  first: DOMRect;
+}
+
+const useIsomorphicLayoutEffect =
+  typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
 /**
- * Custom hook for FLIP (First, Last, Invert, Play) animation technique
- * 
- * Smoothly animates an element from one position to another by:
- * 1. First: Capturing the initial position
- * 2. Last: Moving to the final position
- * 3. Invert: Applying a transform to make it appear in the first position
- * 4. Play: Animating the transform back to 0
- * 
- * This creates buttery-smooth 60fps animations using GPU-accelerated transforms
- * instead of layout-triggering properties like top/left.
- * 
- * @param options - Configuration for the FLIP animation
- * @returns Ref to the element being animated
+ * Custom hook for FLIP (First, Last, Invert, Play) animation technique.
+ *
+ * @param {object} options - Configuration for the FLIP animation
+ * @param {boolean} options.isExpanded - Whether the trace is expanded
+ * @param {boolean} options.isProcessing - Whether a step is processing
+ * @param {number} options.currentStepIndex - Index of the processing step
+ * @param {number} [options.duration] - Animation duration in milliseconds
+ * @param {boolean} [options.enabled] - Whether FLIP animation is enabled
+ * @param {string} [options.blockClass] - Component block class
+ * @param {RefObject<HTMLElement>} [options.containerRef] - Trace root element
+ * @returns FLIP controls for capturing the first position before state changes
  */
 export const useFLIPAnimation = ({
   isExpanded,
@@ -31,110 +38,145 @@ export const useFLIPAnimation = ({
   duration = 400,
   enabled = true,
   blockClass = 'clabs--inline-reasoning-trace',
+  containerRef,
 }: FLIPOptions) => {
-  const firstPositionRef = useRef<DOMRect | null>(null);
-  const elementRef = useRef<HTMLElement | null>(null);
-  const isFirstRender = useRef(true);
-  
-  useEffect(() => {
-    // Skip if FLIP is disabled or not processing
-    if (!enabled || !isProcessing) {
-      return;
-    }
-    
-    // Skip animation on first render
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    
-    // Find the processing label element
-    const processingLabel = document.querySelector(
+  const pendingStateRef = useRef<FLIPState | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const cleanupTimeoutRef = useRef<number | null>(null);
+  const animatedElementRef = useRef<HTMLElement | null>(null);
+  const hiddenElementRef = useRef<HTMLElement | null>(null);
+
+  const getRootElement = useCallback(
+    () => containerRef?.current ?? document,
+    [containerRef]
+  );
+
+  const getCollapsedTitle = useCallback(() => {
+    return getRootElement().querySelector(
       '[data-flip-id^="processing-step-"]'
-    ) as HTMLElement;
-    
-    // Find the corresponding step in the expanded list
-    const stepInList = document.querySelector(
+    ) as HTMLElement | null;
+  }, [getRootElement]);
+
+  const getExpandedTitle = useCallback(() => {
+    return getRootElement().querySelector(
       `[data-step-index="${currentStepIndex}"] .${blockClass}__step-name-wrapper`
-    ) as HTMLElement;
-    
-    if (!processingLabel) {
+    ) as HTMLElement | null;
+  }, [blockClass, currentStepIndex, getRootElement]);
+
+  const cleanupAnimation = useCallback(() => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (cleanupTimeoutRef.current !== null) {
+      clearTimeout(cleanupTimeoutRef.current);
+      cleanupTimeoutRef.current = null;
+    }
+
+    if (animatedElementRef.current) {
+      animatedElementRef.current.style.transition = '';
+      animatedElementRef.current.style.transform = '';
+      animatedElementRef.current.style.transformOrigin = '';
+      animatedElementRef.current.removeAttribute('data-flip-animating');
+      animatedElementRef.current = null;
+    }
+
+    if (hiddenElementRef.current) {
+      hiddenElementRef.current.style.visibility = '';
+      hiddenElementRef.current = null;
+    }
+  }, []);
+
+  const captureFirst = useCallback(() => {
+    if (!enabled || !isProcessing) {
+      pendingStateRef.current = null;
       return;
     }
-    
-    elementRef.current = processingLabel;
-    
-    // FIRST: Capture the initial position
-    // This could be either the processing label or the step in the list
-    const sourceElement = isExpanded ? processingLabel : stepInList;
+
+    const sourceElement = isExpanded ? getExpandedTitle() : getCollapsedTitle();
     if (!sourceElement) {
+      pendingStateRef.current = null;
       return;
     }
-    
-    const first = sourceElement.getBoundingClientRect();
-    
-    // Store for next transition
-    if (!firstPositionRef.current) {
-      firstPositionRef.current = first;
+
+    cleanupAnimation();
+    pendingStateRef.current = {
+      first: sourceElement.getBoundingClientRect(),
+    };
+  }, [
+    cleanupAnimation,
+    enabled,
+    getCollapsedTitle,
+    getExpandedTitle,
+    isExpanded,
+    isProcessing,
+  ]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!enabled || !isProcessing) {
+      pendingStateRef.current = null;
+      cleanupAnimation();
       return;
     }
-    
-    // LAST: Element is now in its final position
-    const targetElement = isExpanded ? stepInList : processingLabel;
+
+    const pendingState = pendingStateRef.current;
+    if (!pendingState) {
+      return;
+    }
+
+    pendingStateRef.current = null;
+
+    const targetElement = isExpanded ? getExpandedTitle() : getCollapsedTitle();
     if (!targetElement) {
       return;
     }
-    
-    const last = targetElement.getBoundingClientRect();
-    
-    // INVERT: Calculate the difference between first and last positions
-    const deltaX = firstPositionRef.current.left - last.left;
-    const deltaY = firstPositionRef.current.top - last.top;
-    const deltaW = firstPositionRef.current.width / last.width;
-    const deltaH = firstPositionRef.current.height / last.height;
-    
-    // Apply the inverted transform (makes element appear in first position)
-    targetElement.style.transformOrigin = 'top left';
-    targetElement.style.transform = `
-      translate(${deltaX}px, ${deltaY}px)
-      scale(${deltaW}, ${deltaH})
-    `;
-    targetElement.setAttribute('data-flip-animating', 'true');
-    
-    // PLAY: Animate to the final position (transform: none)
-    requestAnimationFrame(() => {
-      targetElement.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0.14, 0.3, 1)`;
-      targetElement.style.transform = 'none';
-    });
-    
-    // Update first position for next transition
-    firstPositionRef.current = last;
-    
-    // Cleanup after animation completes
-    const cleanup = () => {
-      targetElement.style.transition = '';
-      targetElement.style.transform = '';
-      targetElement.style.transformOrigin = '';
-      targetElement.removeAttribute('data-flip-animating');
-    };
-    
-    const timeoutId = setTimeout(cleanup, duration);
-    
-    return () => {
-      clearTimeout(timeoutId);
-      cleanup();
-    };
-    
-  }, [isExpanded, isProcessing, currentStepIndex, duration, enabled]);
-  
-  // Reset on unmount
-  useEffect(() => {
-    return () => {
-      isFirstRender.current = true;
-      firstPositionRef.current = null;
-    };
-  }, []);
-  
-  return elementRef;
-};
 
+    const last = targetElement.getBoundingClientRect();
+    const deltaX = pendingState.first.left - last.left;
+    const deltaY = pendingState.first.top - last.top;
+    const hasMoved = Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5;
+
+    if (!hasMoved) {
+      return;
+    }
+
+    const duplicateElement = isExpanded
+      ? getCollapsedTitle()
+      : getExpandedTitle();
+    if (duplicateElement && duplicateElement !== targetElement) {
+      duplicateElement.style.visibility = 'hidden';
+      hiddenElementRef.current = duplicateElement;
+    }
+
+    animatedElementRef.current = targetElement;
+    targetElement.style.transformOrigin = 'top left';
+    targetElement.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
+    targetElement.setAttribute('data-flip-animating', 'true');
+
+    targetElement.getBoundingClientRect();
+
+    animationFrameRef.current = requestAnimationFrame(() => {
+      targetElement.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0.14, 0.3, 1)`;
+      targetElement.style.transform = 'translate3d(0, 0, 0)';
+    });
+
+    cleanupTimeoutRef.current = window.setTimeout(cleanupAnimation, duration);
+
+    return cleanupAnimation;
+  }, [
+    cleanupAnimation,
+    duration,
+    enabled,
+    getCollapsedTitle,
+    getExpandedTitle,
+    isExpanded,
+    isProcessing,
+  ]);
+
+  useEffect(() => {
+    return cleanupAnimation;
+  }, [cleanupAnimation]);
+
+  return { captureFirst };
+};

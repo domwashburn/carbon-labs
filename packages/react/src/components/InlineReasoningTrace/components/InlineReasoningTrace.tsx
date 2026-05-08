@@ -28,9 +28,19 @@ const InlineReasoningTrace = ({
 
   const [isExpanded, setIsExpanded] = useState(openByDefault);
   const [shouldRender, setShouldRender] = useState(openByDefault);
+  const [isEntering, setIsEntering] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [hasBeenToggled, setHasBeenToggled] = useState(false);
+  const traceRef = useRef<HTMLDivElement>(null);
+  const enterAnimationFrameRef = useRef<number | null>(null);
   const exitTimeoutRef = useRef<number | null>(null);
+
+  const clearEnterAnimationFrame = useCallback(() => {
+    if (enterAnimationFrameRef.current !== null) {
+      window.cancelAnimationFrame(enterAnimationFrameRef.current);
+      enterAnimationFrameRef.current = null;
+    }
+  }, []);
 
   const clearExitTimeout = useCallback(() => {
     if (exitTimeoutRef.current !== null) {
@@ -41,31 +51,68 @@ const InlineReasoningTrace = ({
 
   const completeExit = useCallback(() => {
     clearExitTimeout();
+    clearEnterAnimationFrame();
     setIsExpanded(false);
     setShouldRender(false);
+    setIsEntering(false);
     setIsExiting(false);
-  }, [clearExitTimeout]);
+  }, [clearEnterAnimationFrame, clearExitTimeout]);
+
+  const { captureFirst } = useFLIPAnimation({
+    isExpanded,
+    isProcessing,
+    currentStepIndex: currentProcessingStepIndex,
+    duration: exitAnimationDuration,
+    enabled: animationMode === 'flip',
+    blockClass,
+    containerRef: traceRef,
+  });
 
   const handleToggle = useCallback(() => {
     setHasBeenToggled(true);
+    captureFirst();
+
     if (isExpanded) {
+      clearEnterAnimationFrame();
       clearExitTimeout();
+      if (animationMode === 'flip') {
+        setIsExpanded(false);
+      }
+      setIsEntering(false);
       setIsExiting(true);
       exitTimeoutRef.current = window.setTimeout(
         completeExit,
         exitAnimationFallbackDelay
       );
     } else {
+      clearEnterAnimationFrame();
       clearExitTimeout();
+      setIsEntering(true);
       setIsExiting(false);
-      setIsExpanded(true);
       setShouldRender(true);
+      setIsExpanded(true);
+      enterAnimationFrameRef.current = window.requestAnimationFrame(() => {
+        enterAnimationFrameRef.current = window.requestAnimationFrame(() => {
+          setIsEntering(false);
+          enterAnimationFrameRef.current = null;
+        });
+      });
     }
-  }, [clearExitTimeout, completeExit, isExpanded]);
+  }, [
+    animationMode,
+    captureFirst,
+    clearEnterAnimationFrame,
+    clearExitTimeout,
+    completeExit,
+    isExpanded,
+  ]);
 
   useEffect(() => {
-    return clearExitTimeout;
-  }, [clearExitTimeout]);
+    return () => {
+      clearEnterAnimationFrame();
+      clearExitTimeout();
+    };
+  }, [clearEnterAnimationFrame, clearExitTimeout]);
 
   const handleContentTransitionEnd = useCallback(
     (event: React.TransitionEvent<HTMLDivElement>) => {
@@ -85,17 +132,8 @@ const InlineReasoningTrace = ({
       ? steps[currentProcessingStepIndex]
       : null;
 
-  useFLIPAnimation({
-    isExpanded,
-    isProcessing,
-    currentStepIndex: currentProcessingStepIndex,
-    duration: 400,
-    enabled: animationMode === 'flip',
-    blockClass,
-  });
-
   return (
-    <div className={blockClass}>
+    <div className={blockClass} ref={traceRef}>
       <button
         type="button"
         className={cx(`${blockClass}__trigger`, {
@@ -120,6 +158,7 @@ const InlineReasoningTrace = ({
       {shouldRender && (
         <div
           className={cx(`${blockClass}__content`, {
+            [`${blockClass}__content--entering`]: isEntering,
             [`${blockClass}__content--exiting`]: isExiting,
             [`${blockClass}__content--no-animation`]:
               !hasBeenToggled && openByDefault,
