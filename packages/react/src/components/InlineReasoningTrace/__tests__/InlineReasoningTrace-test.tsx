@@ -34,6 +34,160 @@ const steps = [
 ];
 
 describe('InlineReasoningTrace', () => {
+  const originalResizeObserver = global.ResizeObserver;
+
+  beforeAll(() => {
+    global.ResizeObserver = class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    } as typeof ResizeObserver;
+  });
+
+  afterAll(() => {
+    global.ResizeObserver = originalResizeObserver;
+  });
+
+  it('renders legacy string step content', () => {
+    render(
+      <InlineReasoningTrace
+        triggerText="Reasoning steps"
+        steps={[
+          {
+            stepLabel: 'Legacy step',
+            stepContent: 'Legacy string content',
+          },
+        ]}
+        openByDefault
+      />
+    );
+
+    expect(screen.getByText('Legacy string content')).toBeInTheDocument();
+  });
+
+  it('renders JSX step content', () => {
+    render(
+      <InlineReasoningTrace
+        triggerText="Reasoning steps"
+        steps={[
+          {
+            stepLabel: 'JSX step',
+            stepContent: <span>JSX content</span>,
+          },
+        ]}
+        openByDefault
+      />
+    );
+
+    expect(screen.getByText('JSX content')).toBeInTheDocument();
+  });
+
+  it('renders serializable structured text and code step content in order', () => {
+    render(
+      <InlineReasoningTrace
+        triggerText="Reasoning steps"
+        steps={[
+          {
+            stepLabel: 'Structured step',
+            stepContent: [
+              {
+                type: 'text',
+                content: 'Structured text content',
+              },
+              {
+                type: 'code',
+                label: 'Generated code',
+                language: 'ts',
+                code: 'const answer = 42;',
+              },
+            ],
+          },
+        ]}
+        openByDefault
+      />
+    );
+
+    expect(screen.getByText('Structured text content')).toBeInTheDocument();
+    expect(screen.getByText('Generated code')).toBeInTheDocument();
+    expect(screen.getByText('const answer = 42;')).toBeInTheDocument();
+  });
+
+  it('keeps overflow controls working for structured step content', async () => {
+    const user = userEvent.setup();
+    const scrollHeightDescriptor = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'scrollHeight'
+    );
+    const originalGetComputedStyle = window.getComputedStyle;
+    const getComputedStyle = jest
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation((element) => {
+        const computedStyle = originalGetComputedStyle(element);
+
+        Object.defineProperty(computedStyle, 'lineHeight', {
+          configurable: true,
+          value: '16px',
+        });
+
+        return computedStyle;
+      });
+
+    Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
+      configurable: true,
+      get() {
+        return 100;
+      },
+    });
+
+    try {
+      render(
+        <InlineReasoningTrace
+          triggerText="Reasoning steps"
+          steps={[
+            {
+              stepLabel: 'Structured overflow step',
+              stepContent: [
+                {
+                  type: 'text',
+                  content:
+                    'Structured content should still be measured as one slot.',
+                },
+                {
+                  type: 'code',
+                  code: 'const measured = true;',
+                },
+              ],
+            },
+          ]}
+          openByDefault
+        />
+      );
+
+      const showMoreButton = await screen.findByRole('button', {
+        name: 'Show more',
+      });
+
+      expect(showMoreButton).toHaveAttribute('aria-expanded', 'false');
+
+      await user.click(showMoreButton);
+
+      expect(screen.getByRole('button', { name: 'Show less' })).toHaveAttribute(
+        'aria-expanded',
+        'true'
+      );
+    } finally {
+      getComputedStyle.mockRestore();
+
+      if (scrollHeightDescriptor) {
+        Object.defineProperty(
+          HTMLElement.prototype,
+          'scrollHeight',
+          scrollHeightDescriptor
+        );
+      }
+    }
+  });
+
   it('animates show less when steps are shown by default', async () => {
     const user = userEvent.setup();
     const { container } = render(
