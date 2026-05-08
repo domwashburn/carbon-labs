@@ -7,7 +7,16 @@ import type { InlineReasoningTraceProps } from '../types';
 import { StepList } from './StepList';
 import { ProcessingLabel } from './ProcessingLabel';
 
-export type { TaskType, StepType, InlineReasoningTraceProps } from '../types';
+export type {
+  TaskType,
+  StepContent,
+  StepContentItem,
+  StepTextContentItem,
+  StepCodeContentItem,
+  StepCustomContentItem,
+  StepType,
+  InlineReasoningTraceProps,
+} from '../types';
 
 const exitAnimationDuration = 240;
 const exitAnimationFallbackDelay = exitAnimationDuration + 80;

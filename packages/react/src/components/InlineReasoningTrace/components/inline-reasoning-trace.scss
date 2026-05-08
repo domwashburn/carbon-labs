@@ -404,6 +404,29 @@ $expressive-easing: cubic-bezier(0.4, 0.14, 0.3, 1);
   overflow: hidden;
 }
 
+.#{$prefix}__step-content-items {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-03;
+  width: 100%;
+}
+
+.#{$prefix}__step-content-item-text {
+  margin: 0;
+}
+
+.#{$prefix}__step-content-item-code,
+.#{$prefix}__step-content-item-custom {
+  width: 100%;
+  min-width: 0;
+}
+
+.#{$prefix}__step-content-item-label {
+  @include type.type-style('label-01');
+  margin-bottom: $spacing-02;
+  color: $text-secondary;
+}
+
 .#{$prefix}__step-value--clamped {
   position: relative;
   max-height: 4.5em !important;

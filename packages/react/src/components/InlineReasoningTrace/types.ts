@@ -20,9 +20,33 @@ export type TaskType =
   | 'executing'
   | 'reasoning';
 
+export interface StepTextContentItem {
+  type: 'text';
+  content: string;
+}
+
+export interface StepCodeContentItem {
+  type: 'code';
+  code: string;
+  language?: string;
+  label?: string;
+}
+
+export interface StepCustomContentItem {
+  type: 'custom';
+  content: React.ReactNode;
+}
+
+export type StepContentItem =
+  | StepTextContentItem
+  | StepCodeContentItem
+  | StepCustomContentItem;
+
+export type StepContent = React.ReactNode | StepContentItem[];
+
 export interface StepType {
   stepLabel: string;
-  stepContent: React.ReactNode; // Flexible content - can be string, JSX, or any React node
+  stepContent: StepContent; // Flexible content - can be string, JSX, or structured content items
   delimiter?: string;
   hasOverlay?: boolean;
   isGoverned?: string | boolean;
@@ -82,7 +106,7 @@ export interface StepProps {
 }
 
 export interface StepContentProps {
-  content: React.ReactNode;
+  content: StepContent;
   isExpanded: boolean;
   hasOverflow: boolean;
 }

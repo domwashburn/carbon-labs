@@ -7,16 +7,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 export { default as InlineReasoningTrace } from './components/InlineReasoningTrace';
-export type { 
-  TaskType, 
-  StepType, 
+export type {
+  TaskType,
+  StepContent,
+  StepContentItem,
+  StepTextContentItem,
+  StepCodeContentItem,
+  StepCustomContentItem,
+  StepType,
   InlineReasoningTraceProps,
   StepTitleProps,
   StepContentProps,
   StepProps,
   StepListProps,
   ProcessingLabelProps,
-  IconIndicatorsProps
+  IconIndicatorsProps,
 } from './types';
 
 // Made with Bob
