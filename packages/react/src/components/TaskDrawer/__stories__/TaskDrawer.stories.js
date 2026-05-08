@@ -11,12 +11,16 @@ import React, { useState } from 'react';
 import { TaskDrawer } from '../components/TaskDrawer';
 import '../components/task-drawer.scss';
 import { useTaskMutation } from '../components/hooks/use-task-mutation';
+import mdx from './TaskDrawer.mdx';
 
 export default {
   title: 'Components/TaskDrawer',
   component: TaskDrawer,
   parameters: {
     layout: 'padded',
+    docs: {
+      page: mdx,
+    },
   },
   argTypes: {
     planStatus: {
