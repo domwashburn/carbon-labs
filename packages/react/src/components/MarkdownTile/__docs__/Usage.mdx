@@ -1,0 +1,34 @@
+import { Canvas } from '@storybook/addon-docs/blocks';
+import * as MarkdownTileStories from '../__stories__/MarkdownTile.stories';
+
+# Usage
+
+MarkdownTile is for AI-generated markdown that needs to stay readable,
+reviewable, and actionable inside assistant or workflow surfaces.
+
+## Anatomy
+
+1. Header with variant tag, AI label, comments badge, and utility actions
+2. Optional title and subtitle
+3. Rendered markdown body
+4. Optional annotation highlights and comment thread
+5. Sticky footer with expand/collapse and plan approval action
+
+## Behaviors
+
+| Behavior            | Guidance                                                                           |
+| ------------------- | ---------------------------------------------------------------------------------- |
+| Collapsed state     | Use when markdown is long and the user needs a preview in a chat thread.           |
+| Expanded state      | Use when the user is reading, copying, downloading, or annotating content.         |
+| Annotation workflow | Use `annotatable`, `annotations`, and `onAnnotationsChange` for revision feedback. |
+| Approval workflow   | Use the `plan` variant when the generated content can be approved or submitted.    |
+| AI disclosure       | Keep `aiLabel` enabled when the content was generated or transformed by AI.        |
+
+<Canvas of={MarkdownTileStories.Plan} />
+
+## Content
+
+MarkdownTile supports headings, paragraphs, blockquotes, ordered and unordered
+lists, inline emphasis, inline code, links, code blocks, and horizontal rules.
+Keep generated markdown structured enough that users can scan the output before
+acting on it.

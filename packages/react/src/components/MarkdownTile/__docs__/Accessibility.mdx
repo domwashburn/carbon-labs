@@ -1,0 +1,32 @@
+# Accessibility
+
+MarkdownTile uses semantic article, heading, list, blockquote, link, and code
+elements for rendered markdown. Interactive actions use Carbon buttons and icon
+buttons for focus handling and accessible labels.
+
+## Keyboard
+
+| Interaction                                | Behavior                                                                                           |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Tab                                        | Moves through header actions, AI label, annotation controls, comment controls, and footer actions. |
+| Enter or Space on annotation highlight     | Selects the annotation and scrolls it into view.                                                   |
+| Escape in comment composer                 | Cancels the composer.                                                                              |
+| Command+Enter or Control+Enter in composer | Submits a non-empty comment.                                                                       |
+
+## AI disclosure
+
+Generated content should keep the AI label enabled. The AI label contains
+explainability content and guidance for annotation workflows when annotation is
+enabled.
+
+## Annotation guidance
+
+Highlights are rendered as `mark` elements with keyboard activation. Comment
+thread items expose delete actions as Carbon icon buttons. Consumers should
+persist annotation changes announced through `onAnnotationsChange` when comments
+need to survive navigation.
+
+## Reduced motion
+
+The component removes decorative transitions when
+`prefers-reduced-motion: reduce` is active.

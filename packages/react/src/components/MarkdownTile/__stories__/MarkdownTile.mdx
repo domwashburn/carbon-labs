@@ -1,0 +1,78 @@
+import { ArgTypes, Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
+import * as MarkdownTileStories from './MarkdownTile.stories';
+
+<Meta isTemplate />
+
+# MarkdownTile
+
+- **Initiative owner(s):** Carbon Labs
+- **Status:** Draft
+- **Target library:** React
+- **Target library maintainer(s) / PR Reviewer(s):** N/A
+- **Support channel:** `#carbon-labs`
+
+## Overview
+
+MarkdownTile renders generated markdown inside a Carbon-styled AI tile. It
+supports collapsed and expanded reading states, Carbon AI label explainability,
+copy and download actions, thumbs-up/down feedback, and optional inline comment
+annotations for revision workflows.
+
+<Canvas of={MarkdownTileStories.Plan} />
+
+<Controls />
+
+## Getting started
+
+```bash
+yarn add @carbon/react
+yarn add @carbon-labs/react-markdown-tile
+```
+
+### JS (via import)
+
+```javascript
+import { MarkdownTile } from '@carbon-labs/react-markdown-tile/es/index';
+
+function App() {
+  return (
+    <MarkdownTile
+      variant="plan"
+      title="Implementation plan"
+      content="## Summary\n\nShip the work in three phases."
+      annotatable
+      initiallyExpanded
+    />
+  );
+}
+```
+
+### SCSS
+
+```scss
+@use '@carbon/react';
+@use '@carbon-labs/react-markdown-tile/scss/markdown-tile';
+```
+
+## Variants
+
+Use `plan` when the tile has an approval action, `reference` for source
+material, and `insight` for synthesized analysis.
+
+<Canvas of={MarkdownTileStories.Reference} />
+
+<Canvas of={MarkdownTileStories.Insight} />
+
+## Annotation workflow
+
+Set `annotatable` to allow users to highlight text while the tile is expanded
+and add a comment. Use `annotations` and `onAnnotationsChange` when annotation
+state must be owned by the consuming application.
+
+<Canvas of={MarkdownTileStories.WithComments} />
+
+<Canvas of={MarkdownTileStories.ControlledAnnotations} />
+
+## Component API
+
+<ArgTypes />

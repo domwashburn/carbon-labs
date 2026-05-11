@@ -1,0 +1,29 @@
+# Style
+
+MarkdownTile uses Carbon theme, spacing, type, motion, and AI tokens through
+`components/markdown-tile.scss`.
+
+## Tokens
+
+| Area              | Tokens                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Surface           | `$layer`, `$layer-accent`, `$field`                                                                                                         |
+| Text              | `$text-primary`, `$text-secondary`, `$link-primary`                                                                                         |
+| Borders and focus | `$border-subtle-01`, `$border-strong-01`, `$border-interactive`, `$focus`                                                                   |
+| Feedback          | `$support-warning`, `$support-success`, `$highlight`                                                                                        |
+| AI signal         | `$ai-aura-start`, `$ai-aura-end`, `$ai-border-start`, `$ai-border-end`, `$ai-border-strong` via Carbon AI components and AI visual language |
+| Spacing           | `$spacing-01` through `$spacing-13`                                                                                                         |
+| Type              | `body-01`, `body-compact-01`, `heading-05`, `heading-04`, `heading-compact-02`, `label-01`                                                  |
+| Motion            | `$duration-moderate-01`, `$duration-moderate-02`, `motion(standard, productive)`                                                            |
+
+## Layout
+
+The header and footer are sticky inside the tile so actions remain reachable
+while reading long markdown. Collapsed tiles cap the markdown area and add a
+fade treatment at the bottom edge.
+
+## Variants
+
+The `plan`, `reference`, and `insight` variants share structure. Variant tone
+comes from the Carbon `Tag` type and from state-driven rim treatments for AI,
+comments, and approval.
