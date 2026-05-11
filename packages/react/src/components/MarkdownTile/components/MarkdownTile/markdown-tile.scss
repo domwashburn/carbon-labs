@@ -1,0 +1,348 @@
+/**
+ * Copyright IBM Corp. 2026
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/spacing' as *;
+@use '@carbon/styles/scss/type' as *;
+@use '@carbon/styles/scss/motion' as *;
+@use '@carbon/styles/scss/colors' as *;
+
+$prefix: 'clabs' !default;
+
+.#{$prefix}--markdown-tile {
+  position: relative;
+  border-radius: $spacing-03;
+  background: $layer;
+  color: $text-primary;
+  font-family: font-family('sans');
+  inline-size: 100%;
+  isolation: isolate;
+  transition: box-shadow $duration-moderate-01 motion(standard, productive);
+}
+
+.#{$prefix}--markdown-tile--collapsed {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06);
+}
+
+.#{$prefix}--markdown-tile--expanded {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px -8px rgba(15, 98, 254, 0.1),
+    0 16px 48px -16px rgba(0, 0, 0, 0.08);
+}
+
+.#{$prefix}--markdown-tile--has-comments.#{$prefix}--markdown-tile--expanded {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px -8px rgba(241, 194, 27, 0.12),
+    0 16px 48px -16px rgba(0, 0, 0, 0.08);
+}
+
+.#{$prefix}--markdown-tile--approved.#{$prefix}--markdown-tile--expanded {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px -8px rgba(36, 161, 72, 0.12),
+    0 16px 48px -16px rgba(0, 0, 0, 0.08);
+}
+
+.#{$prefix}--markdown-tile__rim {
+  position: absolute;
+  z-index: 0;
+  border-radius: $spacing-03;
+  background: radial-gradient(
+      ellipse 30% 100% at 0% 50%,
+      rgba(69, 137, 255, 0.2),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 100% 30% at 50% 0%,
+      rgba(120, 169, 255, 0.14),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 30% 100% at 100% 50%,
+      rgba(0, 67, 206, 0.18),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 100% 30% at 50% 100%,
+      rgba(120, 169, 255, 0.1),
+      transparent 62%
+    );
+  inset: 0;
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity $duration-moderate-02 motion(standard, productive),
+    background $duration-moderate-02 motion(standard, productive);
+}
+
+.#{$prefix}--markdown-tile--expanded .#{$prefix}--markdown-tile__rim {
+  opacity: 1;
+}
+
+.#{$prefix}--markdown-tile--has-comments .#{$prefix}--markdown-tile__rim {
+  background: radial-gradient(
+      ellipse 30% 100% at 0% 50%,
+      rgba(241, 194, 27, 0.22),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 100% 30% at 50% 0%,
+      rgba(241, 194, 27, 0.15),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 30% 100% at 100% 50%,
+      rgba(245, 134, 23, 0.2),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 100% 30% at 50% 100%,
+      rgba(241, 194, 27, 0.1),
+      transparent 62%
+    );
+}
+
+.#{$prefix}--markdown-tile--approved .#{$prefix}--markdown-tile__rim {
+  background: radial-gradient(
+      ellipse 30% 100% at 0% 50%,
+      rgba(36, 161, 72, 0.22),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 100% 30% at 50% 0%,
+      rgba(66, 190, 101, 0.15),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 30% 100% at 100% 50%,
+      rgba(36, 161, 72, 0.2),
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 100% 30% at 50% 100%,
+      rgba(66, 190, 101, 0.1),
+      transparent 62%
+    );
+}
+
+.#{$prefix}--markdown-tile__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  overflow: clip;
+  flex-direction: column;
+  border-radius: $spacing-03;
+  background: $layer;
+}
+
+.#{$prefix}--markdown-tile__header {
+  position: sticky;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-03 $spacing-03 $spacing-03 $spacing-05;
+  border-radius: $spacing-03 $spacing-03 0 0;
+  backdrop-filter: blur(12px) saturate(160%);
+  background: rgba(255, 255, 255, 0.92);
+  gap: $spacing-03;
+  inset-block-start: 0;
+  min-block-size: $spacing-09;
+}
+
+.#{$prefix}--markdown-tile--expanded .#{$prefix}--markdown-tile__header {
+  border-block-end: 1px solid $border-subtle-01;
+}
+
+.#{$prefix}--markdown-tile__label-row,
+.#{$prefix}--markdown-tile__actions {
+  display: flex;
+  align-items: center;
+}
+
+.#{$prefix}--markdown-tile__label-row {
+  gap: $spacing-03;
+  min-inline-size: 0;
+}
+
+.#{$prefix}--markdown-tile__actions {
+  flex-shrink: 0;
+}
+
+.#{$prefix}--markdown-tile__type-label {
+  margin: 0;
+}
+
+.#{$prefix}--markdown-tile__comment-badge {
+  @include type-style('label-01');
+
+  display: inline-flex;
+  align-items: center;
+  padding: 0 $spacing-03;
+  border: 1px solid $support-warning;
+  border-radius: $spacing-05;
+  background: $highlight;
+  block-size: $spacing-05;
+  color: $text-primary;
+  gap: $spacing-02;
+}
+
+.#{$prefix}--markdown-tile--approved .#{$prefix}--markdown-tile__comment-badge {
+  border-color: $support-success;
+  background: $support-success-inverse;
+}
+
+.#{$prefix}--markdown-tile__ai-content {
+  max-inline-size: 18rem;
+
+  h2 {
+    @include type-style('heading-03');
+
+    margin: 0 0 $spacing-03;
+  }
+
+  p {
+    @include type-style('body-compact-01');
+
+    margin: 0 0 $spacing-03;
+  }
+}
+
+.#{$prefix}--markdown-tile__ai-kicker {
+  color: $text-secondary;
+}
+
+.#{$prefix}--markdown-tile__content {
+  position: relative;
+  flex: 1 1 auto;
+  padding: $spacing-06 $spacing-07 $spacing-07;
+  min-inline-size: 0;
+}
+
+.#{$prefix}--markdown-tile--collapsed .#{$prefix}--markdown-tile__content {
+  overflow: hidden;
+  max-block-size: 20rem;
+  padding-block-end: $spacing-05;
+}
+
+.#{$prefix}--markdown-tile__title-block {
+  margin-block-end: $spacing-05;
+}
+
+.#{$prefix}--markdown-tile__title {
+  @include type-style('heading-05');
+
+  margin: 0;
+  color: $text-primary;
+}
+
+.#{$prefix}--markdown-tile__subtitle {
+  @include type-style('body-compact-01');
+
+  margin: $spacing-03 0 0;
+  color: $text-secondary;
+}
+
+.#{$prefix}--markdown-tile__fade {
+  position: absolute;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 60%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  block-size: $spacing-13;
+  inset-block-end: 0;
+  inset-inline: 0;
+  pointer-events: none;
+}
+
+.#{$prefix}--markdown-tile__footer {
+  position: sticky;
+  z-index: 4;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-04 $spacing-05;
+  border-radius: 0 0 $spacing-03 $spacing-03;
+  backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.78);
+  gap: $spacing-03;
+  inset-block-end: 0;
+}
+
+.#{$prefix}--markdown-tile__footer::before,
+.#{$prefix}--markdown-tile__footer::after {
+  position: absolute;
+  content: '';
+  inset-inline: 0;
+  pointer-events: none;
+}
+
+.#{$prefix}--markdown-tile__footer::before {
+  backdrop-filter: blur(4px);
+  block-size: 36px;
+  inset-block-start: -36px;
+  mask: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
+.#{$prefix}--markdown-tile__footer::after {
+  backdrop-filter: blur(12px);
+  block-size: 22px;
+  inset-block-start: -22px;
+  mask: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.6) 40%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
+.#{$prefix}--markdown-tile__primary-button--done:disabled {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$prefix}--markdown-tile,
+  .#{$prefix}--markdown-tile__rim {
+    transition: none;
+  }
+}
+
+@media (width <= 42rem) {
+  .#{$prefix}--markdown-tile__header,
+  .#{$prefix}--markdown-tile__footer {
+    align-items: stretch;
+  }
+
+  .#{$prefix}--markdown-tile__header {
+    flex-direction: column;
+  }
+
+  .#{$prefix}--markdown-tile__actions {
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .#{$prefix}--markdown-tile__content {
+    padding: $spacing-05;
+  }
+
+  .#{$prefix}--markdown-tile__footer {
+    flex-direction: column;
+
+    .cds--btn {
+      inline-size: 100%;
+      max-inline-size: none;
+    }
+  }
+}

@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://unpkg.com/@ibm/telemetry-config-schema@v1/dist/config.schema.json
+
+version: 1
+projectId: 2db47d18-7d98-4b95-a39a-4cb2526f7b7f
+endpoint: https://www-api.ibm.com/ibm-telemetry/v1/metrics
+collect:
+  jsx:
+    elements:
+      allowedAttributeNames:
+        # MarkdownTile
+        - actionState
+        - aiExplainabilityDescription
+        - aiExplainabilityTitle
+        - aiLabel
+        - aiLabelText
+        - annotations
+        - annotatable
+        - approveActionLabel
+        - collapseLabel
+        - content
+        - defaultActionState
+        - defaultAnnotations
+        - doneActionLabel
+        - downloadFileName
+        - expandPillLabel
+        - initiallyExpanded
+        - onActionStateChange
+        - onAnnotationsChange
+        - onCopy
+        - onDownload
+        - onFeedback
+        - onPrimaryAction
+        - secondaryActions
+        - subtitle
+        - title
+        - updateActionLabel
+        - variant
+        # React
+        - className
+        - key
+        - ref
+      allowedAttributeStringValues: []
+  npm:
+    dependencies: null
+  js:
+    functions: {}
+    tokens: null

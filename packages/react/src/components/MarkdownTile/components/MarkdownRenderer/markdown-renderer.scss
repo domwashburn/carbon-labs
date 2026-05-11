@@ -1,0 +1,128 @@
+/**
+ * Copyright IBM Corp. 2026
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/spacing' as *;
+@use '@carbon/styles/scss/type' as *;
+
+$prefix: 'clabs' !default;
+
+.#{$prefix}--markdown-tile__markdown {
+  @include type-style('body-01');
+
+  color: $text-primary;
+}
+
+.#{$prefix}--markdown-tile__markdown-heading {
+  margin: $spacing-07 0 $spacing-04;
+  color: $text-primary;
+}
+
+.#{$prefix}--markdown-tile__markdown-heading:first-child {
+  margin-block-start: 0;
+}
+
+.#{$prefix}--markdown-tile__markdown-heading--1 {
+  @include type-style('heading-04');
+}
+
+.#{$prefix}--markdown-tile__markdown-heading--2,
+.#{$prefix}--markdown-tile__markdown-heading--3,
+.#{$prefix}--markdown-tile__markdown-heading--4 {
+  @include type-style('heading-compact-02');
+}
+
+.#{$prefix}--markdown-tile__markdown-paragraph,
+.#{$prefix}--markdown-tile__markdown-list,
+.#{$prefix}--markdown-tile__markdown-quote {
+  margin: 0 0 $spacing-05;
+}
+
+.#{$prefix}--markdown-tile__markdown-list {
+  padding-inline-start: $spacing-06;
+}
+
+.#{$prefix}--markdown-tile__markdown-list li + li {
+  margin-block-start: $spacing-02;
+}
+
+.#{$prefix}--markdown-tile__markdown-quote {
+  padding: $spacing-04 $spacing-05;
+  background: $layer-accent;
+  border-inline-start: 3px solid $border-interactive;
+  color: $text-secondary;
+}
+
+.#{$prefix}--markdown-tile__markdown-quote p {
+  margin: 0;
+}
+
+.#{$prefix}--markdown-tile__markdown-code {
+  position: relative;
+  overflow: auto;
+  padding: $spacing-06 $spacing-05 $spacing-05;
+  margin: $spacing-05 0;
+  background: $layer-accent;
+  color: $text-primary;
+  font-family: font-family('mono');
+  white-space: pre;
+}
+
+.#{$prefix}--markdown-tile__markdown-code-language {
+  @include type-style('label-01');
+
+  position: absolute;
+  color: $text-secondary;
+  inset-block-start: $spacing-03;
+  inset-inline-end: $spacing-04;
+  text-transform: uppercase;
+}
+
+.#{$prefix}--markdown-tile__markdown-inline-code {
+  padding: 0 $spacing-02;
+  background: $layer-accent;
+  font-family: font-family('mono');
+}
+
+.#{$prefix}--markdown-tile__markdown-link {
+  color: $link-primary;
+}
+
+.#{$prefix}--markdown-tile__markdown-rule {
+  border: 0;
+  border-block-start: 1px solid $border-subtle-01;
+  margin-block: $spacing-06;
+}
+
+.#{$prefix}--markdown-tile__annotation {
+  padding: 0 $spacing-01;
+  border-radius: $spacing-01;
+  cursor: pointer;
+
+  .#{$prefix}--text-highlighter__container {
+    display: inline;
+    padding: 0;
+    background: $highlight;
+    box-shadow: inset 0 -1px $support-warning;
+    color: inherit;
+  }
+
+  mark {
+    background: inherit;
+    color: inherit;
+  }
+}
+
+.#{$prefix}--markdown-tile__annotation--active {
+  outline: 2px solid $focus;
+  outline-offset: 1px;
+
+  .#{$prefix}--text-highlighter__container {
+    background: $background-inverse;
+    color: $text-inverse;
+  }
+}

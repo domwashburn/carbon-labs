@@ -1,0 +1,100 @@
+/**
+ * Copyright IBM Corp. 2026
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/spacing' as *;
+@use '@carbon/styles/scss/type' as *;
+
+$prefix: 'clabs' !default;
+
+.#{$prefix}--markdown-tile__thread {
+  border-block-start: 1px solid $border-subtle-01;
+}
+
+.#{$prefix}--markdown-tile__thread-toggle {
+  @include type-style('body-compact-01');
+
+  display: flex;
+  align-items: center;
+  padding: $spacing-04 $spacing-05;
+  border: 0;
+  background: $layer;
+  color: $text-primary;
+  cursor: pointer;
+  gap: $spacing-03;
+  inline-size: 100%;
+  text-align: start;
+}
+
+.#{$prefix}--markdown-tile__thread-count {
+  flex: 1;
+}
+
+.#{$prefix}--markdown-tile__thread-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0 $spacing-05 $spacing-05;
+  margin: 0;
+  gap: $spacing-03;
+  list-style: none;
+}
+
+.#{$prefix}--markdown-tile__thread-item {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-04;
+  border: 1px solid $border-subtle-01;
+  background: $layer;
+  cursor: pointer;
+  gap: $spacing-03;
+}
+
+.#{$prefix}--markdown-tile__thread-item--active {
+  outline: 2px solid $focus;
+  outline-offset: -2px;
+}
+
+.#{$prefix}--markdown-tile__thread-item-main {
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  min-inline-size: 0;
+  text-align: start;
+}
+
+.#{$prefix}--markdown-tile__thread-quote {
+  @include type-style('label-01');
+
+  display: flex;
+  color: $text-secondary;
+  gap: $spacing-03;
+  margin-block-end: $spacing-03;
+}
+
+.#{$prefix}--markdown-tile__thread-quote-bar {
+  flex-shrink: 0;
+  background: $support-warning;
+  inline-size: 3px;
+}
+
+.#{$prefix}--markdown-tile__thread-body {
+  @include type-style('body-compact-01');
+
+  margin: 0;
+}
+
+.#{$prefix}--markdown-tile__thread-meta {
+  @include type-style('label-01');
+
+  display: block;
+  color: $text-secondary;
+  margin-block-start: $spacing-03;
+}

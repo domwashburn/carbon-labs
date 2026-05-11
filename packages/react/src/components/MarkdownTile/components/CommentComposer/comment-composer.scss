@@ -1,0 +1,109 @@
+/**
+ * Copyright IBM Corp. 2026
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/spacing' as *;
+@use '@carbon/styles/scss/type' as *;
+
+$prefix: 'clabs' !default;
+
+.#{$prefix}--markdown-tile__composer-backdrop {
+  position: fixed;
+  z-index: 9;
+  background: rgba(0, 0, 0, 0.18);
+  inset: 0;
+}
+
+.#{$prefix}--markdown-tile__composer {
+  position: absolute;
+  z-index: 10;
+  padding: $spacing-04;
+  border: 1px solid $border-subtle-01;
+  background: $layer;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  inline-size: min(22rem, calc(100% - #{$spacing-07}));
+}
+
+.#{$prefix}--markdown-tile__composer--sheet {
+  position: fixed;
+  padding: $spacing-05;
+  border-block-end: 0;
+  inline-size: 100%;
+  inset-block-end: 0;
+  inset-inline: 0;
+}
+
+.#{$prefix}--markdown-tile__composer-handle {
+  display: flex;
+  justify-content: center;
+  margin-block-end: $spacing-04;
+
+  span {
+    display: block;
+    background: $border-subtle-01;
+    block-size: 4px;
+    inline-size: $spacing-08;
+  }
+}
+
+.#{$prefix}--markdown-tile__composer-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: $spacing-04;
+}
+
+.#{$prefix}--markdown-tile__composer-sheet-title {
+  @include type-style('heading-compact-01');
+}
+
+.#{$prefix}--markdown-tile__composer-quote {
+  @include type-style('label-01');
+
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-03;
+  background: $layer-accent;
+  color: $text-secondary;
+  gap: $spacing-02;
+  margin-block-end: $spacing-04;
+}
+
+.#{$prefix}--markdown-tile__composer-label {
+  @include type-style('label-01');
+
+  display: block;
+  color: $text-secondary;
+}
+
+.#{$prefix}--markdown-tile__composer-input {
+  @include type-style('body-compact-01');
+
+  display: block;
+  padding: $spacing-04;
+  border: 0;
+  background: $field;
+  border-block-end: 1px solid $border-strong-01;
+  color: $text-primary;
+  font-family: inherit;
+  inline-size: 100%;
+  margin-block-start: $spacing-02;
+  min-block-size: 5rem;
+  resize: vertical;
+
+  &:focus {
+    outline: 2px solid $focus;
+    outline-offset: -2px;
+  }
+}
+
+.#{$prefix}--markdown-tile__composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-03;
+  margin-block-start: $spacing-04;
+}

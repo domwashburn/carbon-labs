@@ -1,0 +1,22 @@
+/**
+ * Copyright IBM Corp. 2026
+ *
+ * This source code is licensed under the Apache-2.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+@use '@carbon/styles/scss/theme' as *;
+
+$prefix: 'clabs' !default;
+
+.#{$prefix}--markdown-tile__selection-menu {
+  position: absolute;
+  z-index: 8;
+  border: 1px solid $border-subtle-01;
+  background: $layer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.#{$prefix}--markdown-tile__selection-menu--touch {
+  inline-size: max-content;
+}
